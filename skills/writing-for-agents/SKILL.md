@@ -18,6 +18,20 @@ A pointer does two jobs: state what the material is, and list the **branches** t
 - **One trigger per branch.** Synonyms that rename a single branch are one branch written twice; collapse them and keep only genuinely distinct branches.
 - **Cut identity the body already carries.**
 
+## The start file
+
+`AGENTS.md` or `CLAUDE.md` at the repo root is the map the agent reads first. Keep it to what changes the next action. Every line names a path or a rule the agent cannot get by opening one obvious file. When a path or rule it names changes, update that line in the same change. Past about 100 lines, move the extra behind a pointer.
+
+Sections, in this order. Drop a section that has nothing to say.
+
+1. **Project.** One sentence: what this is and who it is for.
+2. **Stack.** One line, and only when the manifest does not already say it. Otherwise point at the manifest (`package.json`, `pyproject.toml`, the lockfile).
+3. **Key files.** The map. Each line is a path, what it is for, and when to open it. List the files an agent must find, not every file.
+4. **Conventions.** Only the unwritten ones: a naming rule or a format no config shows. Point at the formatter, linter, or style doc for the rest.
+5. **Limits.** State what to do: the size, the data rule, the check that must pass. A hard stop that cannot be said as the target stays, with the target beside it.
+6. **Skills.** One pointer to the skill folder or the router. Name a single skill here only when its own description would not make the agent find it.
+7. **Tone.** One line, or a pointer to the style doc, and only when this repo writes text a person reads.
+
 ## The two loads
 
 Every document and pointer you add spends one of two budgets:

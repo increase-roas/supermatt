@@ -11,7 +11,7 @@ Score each area 0 to 3. Cite the evidence for every score.
 
 ## 1. Structure
 
-Can an agent find the right file fast? Look for a short root `AGENTS.md` or `CLAUDE.md` that points to deeper docs, a clear home for domain terms (`GLOSSARY.md`) and decisions (ADRs), and generated output kept out of authored folders. A 2 needs every steering file reachable from the root file.
+Can an agent find the right file fast? Look for a short root `AGENTS.md` or `CLAUDE.md` that follows the start-file sections in `writing-for-agents` (project, stack, key files, unwritten conventions, limits, a skill pointer, tone only when the repo writes for people), a clear home for domain terms (`GLOSSARY.md`) and decisions (ADRs), and generated output kept out of authored folders. A 2 needs every steering file reachable from the root file.
 
 ## 2. Agent architecture
 
