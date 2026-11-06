@@ -1,6 +1,6 @@
 ---
 name: improve-agent-setup
-description: "Score a repository's agent setup (steering files, skills, guardrails, context, scope, safety, workflow) across seven areas, stop when it is healthy, and otherwise rank the fixes into a plan for `/implement`."
+description: "Score a repository's agent setup (steering files, skills, guardrails, context, scope, safety, workflow) across seven areas, stop when it is healthy, and otherwise rank the fixes into a plan for `/implement`. When he already said to fix the setup, do the top-ranked fix in the same turn."
 argument-hint: "[repo path or area]"
 disable-model-invocation: true
 license: MIT
@@ -8,7 +8,7 @@ license: MIT
 
 # Improve Agent Setup
 
-Score how well a repository supports the coding agents that work in it, then name the few changes that would help most. Where `retro` learns from one finished session, this skill surveys the whole repository: its steering files, skills, checks, and conventions, whether or not a session has gone wrong yet. It changes no project files. End with a ranked plan for `/implement`, or a healthy verdict.
+Score how well a repository supports the coding agents that work in it, then name the few changes that would help most. Where `retro` learns from one finished session, this skill surveys the whole repository: its steering files, skills, checks, and conventions, whether or not a session has gone wrong yet. A score on its own changes no project files. When he already said to fix the setup, do the top-ranked fix in the same turn. End with a ranked plan for `/implement`, or a healthy verdict.
 
 If the input is someone else's plugin, skill, zip, or a link to their harness, this is the wrong skill. Load `adopt-harness`. That one merges the better parts into our harness in the same turn.
 
@@ -41,4 +41,4 @@ Done when: every proposed fix names its file, its evidence, and the score it sho
 
 ### Step 4: Report and hand off
 
-Write the report in the conversation using the template in [RUBRIC.md](RUBRIC.md), unless the user asks for a saved file. Recommend the first fix and ask which to pursue with the host's question tool when available. For work that fits this session, tell the user to run `/implement` in Claude linked installs or Cursor, `/supermatt:implement` from the Claude plugin, `$implement` in Codex, or `/skill:implement` in OMP with the chosen fixes. These are user-invoked skills: recommend the next command, do not invoke it or start editing.
+Write the report in the conversation using the template in [RUBRIC.md](RUBRIC.md), unless the user asks for a saved file. Recommend the first fix. When he already told you to fix the setup, do that top fix in this turn. Do not ask which. When he only asked for the score, report it and name the next command: `/implement` in Claude linked installs or Cursor, `/supermatt:implement` from the Claude plugin, `$implement` in Codex, or `/skill:implement` in OMP. Do not start a second workflow.
