@@ -23,7 +23,7 @@
 </p>
 
 - **Claude Code, Codex, Cursor, and OMP.** Each host loads the same canonical 44-skill tree through a package adapter or documented compatibility fallback.
-- **46 skills.** 37 for engineering and 9 for productivity, listed below.
+- **47 skills.** 38 for engineering and 9 for productivity, listed below.
 - **Peer review is repository-controlled.** `docs/agents/cross-model.json` can keep `code-review` and `jury` entirely on current-host readers, automatically select a hardened Claude or Codex peer, or explicitly select Claude, Codex, Cursor Agent, or OMP with supported model and effort values.
 - **One flow from idea to closed issue.** Forked from [mattpocock/skills](https://github.com/mattpocock/skills) at `c55ee46`, each skill checks its own work and hands the result to the next.
 
@@ -219,6 +219,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 | **[improve-file-structure](./skills/improve-file-structure/SKILL.md)** | Assess file organization and stop when it is healthy; otherwise design a clearer layout and a behavior-preserving migration plan for `/implement`, with TypeScript, Go, Python, and Ruby guidance. Multi-session specs retain the approved move map, linked from each affected ticket. |
 | **[refactor](./skills/refactor/SKILL.md)** | Refactor code at method, file, or project scope without changing behavior. Assesses first and stops when the code is clean, and gates edits on test coverage and a verified baseline. |
 | **[improve-agent-setup](./skills/improve-agent-setup/SKILL.md)** | Score a repository's agent setup across seven areas, stop when it is healthy, and otherwise rank the fixes into a plan for `/implement`. |
+| **[fix-repos](./skills/fix-repos/SKILL.md)** | Walk a folder of checkouts, worktrees, and dated dumps one child at a time, and fix that child before the next. |
 | **[improve-tests](./skills/improve-tests/SKILL.md)** | Cut a test suite to the tests that catch real bugs and its run time to the minimum: measure first, delete or demote low-value tests, fix slow setup, and prove every cut keeps the checks that matter. |
 | **[orchestrate](./skills/orchestrate/SKILL.md)** | Work through GitHub issues or local Markdown tickets unattended in parallel Claude Code, Codex, Cursor, or OMP lanes, with workers in Herdr panes and git worktrees. |
 | **[commit](./skills/commit/SKILL.md)** | Commit all changes on the current branch, main included, after a scan for secrets. |

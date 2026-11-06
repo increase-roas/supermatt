@@ -1,0 +1,5 @@
+interface:
+  display_name: "SuperMatt: Fix the repos"
+  short_description: "Fix one repo folder at a time"
+policy:
+  allow_implicit_invocation: true
