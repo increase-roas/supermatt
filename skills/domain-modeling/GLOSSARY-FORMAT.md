@@ -19,7 +19,10 @@ _Avoid_: Bill, payment request
 
 **Customer**:
 A person or organization that places orders.
-_Avoid_: Client, buyer, account
+_Avoid_: Client, account
+_Aka_: Buyer
+`code:` `src/models/customer.ts` → `Customer`
+Example: on a company subscription, the company is the Customer. An employee who can log in is a User.
 
 ## Relationships
 
@@ -34,6 +37,10 @@ _Avoid_: Client, buyer, account
 - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
 - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
 - **Relationships are optional.** Add the section when how terms relate (cardinality, ownership, sequence) is not obvious from their definitions.
+- **Point at the code when a type implements the term.** One line, `` `code:` `` path `→` symbol. Leave it off when the concept has no code yet.
+- **Accepted synonyms are `_Aka_`.** Rejected names stay on `_Avoid_`. A commit check looks for `_Avoid_` names used as that concept.
+- **One example when two nearby concepts get confused.** The example says which is which. Skip it when the definition already draws that line.
+- **A renamed term stays.** Mark it obsolete and point at the new term. Do not delete it.
 
 ## Single vs multi-context repos
 
