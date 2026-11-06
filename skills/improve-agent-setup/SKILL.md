@@ -34,7 +34,7 @@ Done when: each area has a score with cited evidence, or is marked unscored with
 
 ### Step 3: Rank the fixes
 
-For each area below 3, propose the smallest change that raises it to 3, with the file it touches, the anti-pattern it removes, and the cost. Prefer a deterministic check over a new instruction, an amended file over a new one, and a pointer over pasted content. Rank by benefit against effort. Do every one of those fixes in the same turn. Changes to code structure belong in `/improve-architecture`, file placement in `/improve-file-structure`, and slow or low-value tests in `/improve-tests`: name the handoff instead of planning that work here.
+For each area below 3, propose the smallest change that raises it to 3, with the file it touches, the anti-pattern it removes, and the cost. Prefer a deterministic check over a new instruction, an amended file over a new one, and a pointer over pasted content. Rank by benefit against effort. Do every one of those fixes in the same turn. Changes to code structure load and follow `improve-architecture`. File placement loads and follows `improve-file-structure`. Slow or low-value tests load and follow `improve-tests`. Do not only name those skills.
 
 Done when: every proposed fix names its file, its evidence, and the score it should move.
 

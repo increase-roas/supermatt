@@ -166,7 +166,7 @@ Write the regression test **before the fix**, but only if there is a **correct s
 
 A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
 
-**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Report it to the user in Phase 6, and tell them to run `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP to find where the seam should go.
+**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Report it in Phase 6, then load and follow the `improve-architecture` skill through the host's skill mechanism to find where the seam should go, and keep fixing. Do not tell the user to type it.
 
 If a correct seam exists:
 
@@ -199,3 +199,4 @@ Required before declaring done:
 - [ ] The fix is committed, together with the regression test when a correct seam exists; otherwise the missing seam is reported as above. The commit message states the hypothesis that turned out correct, so the next debugger learns.
 - [ ] The fix passes QA, unless an outer flow (such as `implement`) runs QA on this diff itself: write the bug report or captured symptom to a file in the OS temporary directory, then load and follow the `qa` skill through the host's skill mechanism, with the commit you recorded in Phase 5 as the fixed point and that file as the request. A fail is a symptom the fix left behind: take it back to Phase 3.
 - [ ] The fix is reviewed, unless an outer flow (such as `implement`) reviews this diff itself: load and follow the `code-review` skill through the host's skill mechanism, with the commit you recorded in Phase 5 as the fixed point and, as the spec, the bug report file (write it now if the QA step was skipped). Fix every verified finding, at every severity, in the same turn, and commit the fixes. When the aggregate carries one, send the aggregate together with the first fix's tool call: a message with no tool call ends the turn and leaves the fixes to the user.
+- [ ] Load and follow the `retro` skill through the host's skill mechanism in this session, unless an outer flow runs retro itself. Do not tell the user to type it.

@@ -41,13 +41,13 @@ For a PR, the same states read against the attached code: `ready-for-agent` mean
 
 Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
 
-These are canonical role names. The actual label strings used in the issue tracker may differ. The mapping is in `docs/agents/triage-labels.md`, and the tracker operations are in `docs/agents/issue-tracker.md`. Read both before proceeding. If either is missing or unreadable, stop and load and follow the `setup-supermatt-skills` skill through the host's skill mechanism. Resume only after both required docs exist and have been read.
+These are canonical role names. The actual label strings used in the issue tracker may differ. The mapping is in `docs/agents/triage-labels.md`, and the tracker operations are in `docs/agents/issue-tracker.md`. Read both before proceeding. If either is missing or unreadable, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism, then continue this skill once both required docs exist and have been read.
 
 State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time; flag transitions that look unusual and ask before proceeding.
 
 ## Invocation
 
-The maintainer invokes `/triage` in Claude linked installs or Cursor, `/supermatt:triage` from the Claude plugin, `$triage` in Codex, or `/skill:triage` in OMP, and describes what they want in natural language. Interpret the request and act. Examples:
+The maintainer asks for triage in natural language. Interpret the request and act. Examples:
 
 - "Show me anything that needs my attention"
 - "Let's look at #42" (issue or PR)

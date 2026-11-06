@@ -12,7 +12,7 @@ license: MIT
 
 The agent-run counterpart to `diagnosing-bugs`. A failed agent run differs from a code bug: the evidence is a trace of model turns and tool calls, the cause often sits at a runtime contract (tool schema, permission rule, instruction loading, turn limit, resume), and a replay can repeat a real effect. Work from the evidence the user supplies; do not rerun a hosted agent to see what happens.
 
-When the failure turns out to be ordinary code inside a tool or the harness, hand it to `diagnosing-bugs` with the finding as its bug report. When the fix is a skill or steering file, the change is the repair here; `retro` or `improve-agent-setup` covers wider setup work.
+When the failure turns out to be ordinary code inside a tool or the harness, load and follow `diagnosing-bugs` through the host's skill mechanism with the finding as its bug report. When the fix is a skill or steering file and the miss is wider than this one repair, load and follow `improve-agent-setup`. After a repair lands, load and follow `retro`. Do not tell the user to type those skills.
 
 ## Guardrails
 

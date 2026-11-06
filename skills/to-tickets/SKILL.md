@@ -9,7 +9,7 @@ license: MIT
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-Read `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`. If either is missing or unreadable, stop and load and follow the `setup-supermatt-skills` skill through the host's skill mechanism. Resume only after both required docs exist and have been read.
+Read `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`. If either is missing or unreadable, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism, then continue this skill once both docs exist and have been read.
 
 ## Process
 
@@ -65,7 +65,7 @@ Publish the approved tickets. **How** depends on the tracker `/setup-supermatt-s
 
 Preserve an exact `## Parent` reference to the source spec in every child, including local files. Use the tracker's canonical issue reference or a usable Markdown path/link to the local spec. If the source was a spec carrying the canonical `ready-for-agent` role, remove that readiness using the configured label or local `Status:` field: its tickets are now the work, and the spec stays open as their parent. Leave the parent otherwise untouched.
 
-Then stop. Tell the user to run `/implement` in Claude linked installs or Cursor, `/supermatt:implement` from the Claude plugin, `$implement` in Codex, or `/skill:implement` in OMP on a **frontier** ticket (one whose blockers are all closed) in a fresh context, one ticket per session.
+Then load and follow the `implement` skill through the host's skill mechanism on one frontier ticket (one whose blockers are all closed). When that ticket ships and another frontier ticket remains, load `implement` again. Do not tell the user to type it.
 
 <local-ticket-template>
 

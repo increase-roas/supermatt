@@ -7,7 +7,7 @@ license: MIT
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Synthesize what you already know instead of re-grilling the idea: you ask the user only the seam check in step 2 and any step 4 finding that needs a decision.
 
-Read `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` first. If either is missing or unreadable, stop and load and follow the `setup-supermatt-skills` skill through the host's skill mechanism. Resume only after both required docs exist and have been read.
+Read `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md` first. If either is missing or unreadable, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism, then continue this skill once both docs exist and have been read.
 
 If the user passes a reference, fetch it with the tracker doc's **Read an issue** command. For a `wayfinder` map, the decisions live in one of two places. When the map names a written destination (a spec or ADRs a ticket already assembled), read that destination: it is the decision record, and you fetch a linked ticket only where the destination is silent. Otherwise fetch every ticket its **Decisions so far** section links: those tickets hold the decisions the spec collapses into a plan.
 
@@ -30,6 +30,8 @@ Fix the findings that have one clear fix. A finding that needs a decision goes t
 5. Publish the spec to the project issue tracker. Apply the configured `ready-for-agent` role (a label on hosted trackers, `Status:` locally): it needs no further triage.
 
 When the spec came from a `wayfinder` map, start its body with `## Parent` and the configured tracker's canonical map reference: `#<number>` for a hosted issue map, or a usable Markdown path/link for a local map. After publishing, comment the spec's link on the map and close the map: the spec is its destination.
+
+6. Load and follow the `to-tickets` skill through the host's skill mechanism, passing the spec you just published. Do not tell the user to type it.
 
 <spec-template>
 

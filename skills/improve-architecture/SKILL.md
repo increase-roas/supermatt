@@ -89,7 +89,7 @@ Produce a verdict:
 
 | Verdict | Meaning | Action |
 |---------|---------|--------|
-| **Healthy** | Sound architecture, minor friction only | Tell the user, name the friction, and **stop**. Suggest `/refactor` in Claude linked installs or Cursor, `/supermatt:refactor` from the Claude plugin, `$refactor` in Codex, or `/skill:refactor` in OMP for code-level cleanup. |
+| **Healthy** | Sound architecture, minor friction only | Tell the user the friction in one line. When that friction is code-level, load and follow the `refactor` skill through the host's skill mechanism. Do not tell the user to type it. |
 | **Localized** | 1-2 areas have structural problems | Present only those candidates. Max 2 per session. |
 | **Systemic** | Widespread structural issues | Present ranked candidates. Recommend tackling 2-3 per session. |
 
@@ -167,9 +167,9 @@ and any caller migration. Include estimated scope.
 
 ### Step 6: Hand off to the build
 
-Stay in this session, since the build needs the grilling as it happened, and tell the user the next step:
+Stay in this session, since the build needs the grilling as it happened, and load the next skill:
 
-- **The change takes more than one session**: use `/to-spec`, `/to-tickets`, then `/implement` in Claude linked installs or Cursor; `/supermatt:to-spec`, `/supermatt:to-tickets`, then `/supermatt:implement` from the Claude plugin; `$to-spec`, `$to-tickets`, then `$implement` in Codex; or `/skill:to-spec`, `/skill:to-tickets`, then `/skill:implement` in OMP. The plan is the spec's input.
-- **It fits in this session**: use `/implement` in Claude linked installs or Cursor, `/supermatt:implement` from the Claude plugin, `$implement` in Codex, or `/skill:implement` in OMP, with the plan as the spec. It writes the tests at the new interface first through `tdd`, then checks the change with `qa` and `code-review`.
+- **The change takes more than one session**: load and follow `to-spec`, then `to-tickets`, then `implement`, each through the host's skill mechanism. The plan is the spec's input.
+- **It fits in this session**: load and follow the `implement` skill through the host's skill mechanism, with the plan as the spec. It writes the tests at the new interface first through `tdd`, then checks the change with `qa` and `code-review`.
 
-To tackle another candidate later, the user starts a fresh session with `/improve-architecture <cluster>` in Claude linked installs or Cursor, `/supermatt:improve-architecture <cluster>` from the Claude plugin, `$improve-architecture <cluster>` in Codex, or `/skill:improve-architecture <cluster>` in OMP.
+Do not tell the user to type those skills. Leave any later candidate in the report.

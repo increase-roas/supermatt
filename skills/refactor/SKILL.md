@@ -96,7 +96,7 @@ A finding that removes an indirection (a function where a value would do, a para
 
 **User override:** if the user provides a specific reason to refactor code rated Clean (e.g., "I know it looks fine but I want to extract this into smaller functions"), proceed with their request, but scope the changes strictly to what they asked for. Don't expand into a broader refactoring.
 
-**Architecture signal:** if the assessment shows problems that are really about module boundaries (tightly coupled packages, shallow modules, missing abstractions at the architectural level), say so: refactoring code inside a badly-bounded module won't fix the real problem. Tell the user to run `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP.
+**Architecture signal:** if the assessment shows problems that are really about module boundaries (tightly coupled packages, shallow modules, missing abstractions at the architectural level), say so: refactoring code inside a badly-bounded module won't fix the real problem. Load and follow the `improve-architecture` skill through the host's skill mechanism.
 
 ## Step 3: Plan
 
@@ -231,3 +231,4 @@ After refactoring:
 2. **Run all tests** that cover the refactored code. Read the actual output; a command that exited is not a suite that passed. If any fail, fix your refactoring, not the tests.
 3. **Confirm behavior is unchanged**: same inputs produce same outputs. If tests were written in Step 3.5, they serve as the proof.
 4. **Check the result**: re-evaluate the code against Step 2 criteria. The verdict should be **Clean** or **Minor**. If only Minor issues remain, note them but do not re-enter the refactoring loop.
+5. Load and follow the `code-review` skill through the host's skill mechanism on the commits since the baseline. Do not tell the user to type it.

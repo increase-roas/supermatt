@@ -9,7 +9,7 @@ license: MIT
 
 Find where file placement makes a project hard to navigate or change. Design the smallest useful reorganization, grounded in the project's language, framework, and existing conventions. End with a plan for `/implement`; this skill changes no project files. Present the plan in the conversation unless the user requests a saved artifact.
 
-**File placement is the scope.** Moves, descriptive path names, and the import or configuration updates they require belong here. Changes to responsibilities, interfaces, or dependency direction belong in `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP. Code-level cleanup belongs in `/refactor`, `/supermatt:refactor`, `$refactor`, or `/skill:refactor`, respectively. Identify those needs without adding them to a relocation plan.
+**File placement is the scope.** Moves, descriptive path names, and the import or configuration updates they require belong here. When the real problem is responsibilities, interfaces, or dependency direction, load and follow the `improve-architecture` skill through the host's skill mechanism. When it is code-level cleanup, load and follow the `refactor` skill. Do not add those changes to a relocation plan, and do not tell the user to type the other skill.
 
 ## Principles
 

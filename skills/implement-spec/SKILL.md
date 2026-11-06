@@ -9,7 +9,7 @@ Implement the supplied spec and its tickets on one **integration branch**, ready
 
 ## 1. Pin the spec and task graph
 
-Read `docs/agents/issue-tracker.md`, then use its operations to read the spec, every child ticket, and their blocking relationships. If the tracker instructions are missing, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism, then stop. If the spec has no implementation tickets, load and follow the `to-tickets` skill through the host's skill mechanism, then stop.
+Read `docs/agents/issue-tracker.md`, then use its operations to read the spec, every child ticket, and their blocking relationships. If the tracker instructions are missing, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism, then continue this skill once that file exists and has been read. If the spec has no implementation tickets, load and follow the `to-tickets` skill through the host's skill mechanism, then continue from the task graph once the tickets exist.
 
 Build a **task graph** with ticket states `pending`, `running`, `integrated`, and `blocked`. Keep it with the worker assignments, branch names, commit SHAs, and evidence paths in an OS temporary directory outside the repository. A closed ticket counts as integrated only after verifying its implementation is in the integration branch. Surface contradictory criteria before implementation. An open blocker outside this spec stays blocked until its work is merged into the default branch; a dependency cycle needs a user decision.
 
@@ -54,6 +54,6 @@ Leave the integration branch, its worktree, and any PR available for shipping. K
 
 Before removing a worker worktree, retain its reports and session references, confirm the worker and its subagents have exited, verify a clean tree, and verify all its commits are reachable from the integration branch. Remove only worktrees created by this run that meet those conditions. Retain dirty, unmerged, or failed worktrees and name them in the handoff; never force removal. Apply the same lifecycle rule when a run stops early.
 
-Report the integration branch and commit, PR URL if any, integrated and blocked tickets, QA and review verdicts, retained evidence, and worktrees that remain. Before the user clears the session, recommend `/retro` in Claude linked installs or Cursor, `/supermatt:retro` from the Claude plugin, `$retro` in Codex, or `/skill:retro` in OMP, or pass the session logs for a later retrospective.
+Report the integration branch and commit, PR URL if any, integrated and blocked tickets, QA and review verdicts, retained evidence, and worktrees that remain. Then load and follow the `retro` skill through the host's skill mechanism. Do not tell the user to type it.
 
 Adapted from Matt Pocock's [implement-spec at v1.3.1](https://github.com/mattpocock/skills/blob/v1.3.1/skills/engineering/implement-spec/SKILL.md).

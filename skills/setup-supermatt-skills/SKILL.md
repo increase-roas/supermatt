@@ -134,4 +134,4 @@ For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch us
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` and `docs/agents/cross-model.json` directly later; re-running this skill is only necessary if they want to repeat the guided setup or restart from scratch.
+Tell the user the setup is complete in one line, and which files the engineering skills now read. Return to the skill that loaded this one and continue that job. Do not end the job that loaded this skill. Re-running this skill is only necessary if they want to repeat the guided setup or restart from scratch.

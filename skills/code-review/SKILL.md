@@ -18,7 +18,7 @@ Three-axis review of the diff between `HEAD` and a fixed point the user supplies
 
 Every axis has an independent **host reader** and, when repository settings select one, an **external reader**. They run in parallel so they do not pollute each other's context. Agreement is cross-family evidence only when authoritative provider metadata establishes distinct host and external families. This skill aggregates what survives validation.
 
-The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism.
+The issue tracker should have been provided to you. If `docs/agents/issue-tracker.md` is missing, load and follow the `setup-supermatt-skills` skill through the host's skill mechanism, then continue this review once that file exists.
 
 ## Process
 
