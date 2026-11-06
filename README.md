@@ -201,7 +201,7 @@ Some of the checks above are adapted from other skill sets:
 | Dex Horthy's [show-me](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) | `pr` |
 | GitHub's [awesome-copilot](https://github.com/github/awesome-copilot) refactor skills | `refactor` |
 | Leonardo Flores's [reducing-entropy](https://github.com/softaworks/agent-toolkit/tree/main/skills/reducing-entropy) | `refactor` |
-| Affaan Mustafa's [ECC](https://github.com/affaan-m/ecc/tree/ef648e01899ba3e8dc6371642deaaf64b4477775) | Evidence practices in `research` and `handoff`, parallel resource ownership, contract verification, performance comparisons, and maintainer evaluation ideas. See [attribution](./THIRD-PARTY-NOTICES.md). |
+| Affaan Mustafa's [ECC](https://github.com/affaan-m/ecc/tree/ef648e01899ba3e8dc6371642deaaf64b4477775) | Evidence practices in `research` and `handoff`, parallel resource ownership, contract verification, performance comparisons, and maintainer evaluation ideas. A 2026-11-06 pass against `b38be6a` added the noob-facing gaps: session resume, ready-claim checks, search-before-build, lint-config protection, and click-path state. See [attribution](./THIRD-PARTY-NOTICES.md). |
 
 The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 
@@ -229,9 +229,9 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 | **[setup-supermatt-skills](./skills/setup-supermatt-skills/SKILL.md)** | Configure this repo for the engineering skills: issue tracker, triage labels, domain doc layout, and external peer policy. Run once per repo. |
 | **[to-spec](./skills/to-spec/SKILL.md)** | Turn the current conversation into a spec and publish it to the issue tracker. |
 | **[to-tickets](./skills/to-tickets/SKILL.md)** | Break any plan, spec, or conversation into a set of tracer-bullet tickets, each declaring its blocking edges, as text in one file per ticket locally or as native blocking links where supported, otherwise the configured textual fallback. |
-| **[implement](./skills/implement/SKILL.md)** | Build the work described by a spec, tickets, or triaged issues, driving `/tdd` at pre-agreed seams, then committing, checking it with `/qa`, and closing out with `/code-review`. |
+| **[implement](./skills/implement/SKILL.md)** | Build the work described by a spec, tickets, or triaged issues, driving `/tdd` at pre-agreed seams, then committing, checking it with `/qa`, and closing out with `/code-review`. Names callers before the first edit and searches before adding a helper. |
 | **[implement-spec](./skills/implement-spec/SKILL.md)** | Build a whole spec through native parallel subagents in ticket worktrees, integrate into one branch, and verify the combined result with `/qa` and `/code-review` before shipping. |
-| **[retro](./skills/retro/SKILL.md)** | Run a retrospective on verified Claude Code, Codex, Cursor, or OMP session evidence and get ranked suggestions for the agent's environment, with explicit gaps when full history is unavailable. |
+| **[retro](./skills/retro/SKILL.md)** | Run a retrospective on verified Claude Code, Codex, Cursor, or OMP session evidence and get ranked suggestions for the agent's environment, with explicit gaps when full history is unavailable. A repeated pitfall is recorded with its signal. |
 | **[wayfinder](./skills/wayfinder/SKILL.md)** | Plan a huge chunk of work as a shared map of decision tickets. Where the tracker lacks exclusive acquisition, one coordinator grants session-owned claims before tickets run in parallel. |
 
 ### Model-invoked
@@ -239,12 +239,12 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 | Skill | What it does |
 |---|---|
 | **[prototype](./skills/prototype/SKILL.md)** | Build a throwaway prototype to answer a design question: a single shareable HTML file for state/logic, including when two rules can send one situation two ways, or several toggleable UI variations. |
-| **[diagnosing-bugs](./skills/diagnosing-bugs/SKILL.md)** | Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test. |
+| **[diagnosing-bugs](./skills/diagnosing-bugs/SKILL.md)** | Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test. A wall of type errors is fixed one at a time. A repeating loop needs a stop and a retry cap. |
 | **[diagnosing-agent-runs](./skills/diagnosing-agent-runs/SKILL.md)** | Diagnose, repair, and verify a failed AI agent run from its traces, logs, and config: find the first deviation, test the runtime contract behind it, make the smallest repair, and verify the task outcome as PASS, FAIL, or PENDING. |
 | **[adopt-harness](./skills/adopt-harness/SKILL.md)** | Scan a dropped plugin, skill, zip, or someone else's harness and merge the better parts into ours in the same turn. |
 | **[project-lore](./skills/project-lore/SKILL.md)** | Read, record, and check the project facts the code cannot show: consult `docs/lore/` before planning or fixing, and match the diff to `code:` paths before a commit. |
-| **[verifying-completion](./skills/verifying-completion/SKILL.md)** | Prove a claim with fresh evidence before making it: name the check, run it now, read the output, and claim only what it proved. |
-| **[research](./skills/research/SKILL.md)** | Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, using a background agent when available, with fresh-session or direct-research fallbacks. |
+| **[verifying-completion](./skills/verifying-completion/SKILL.md)** | Prove a claim with fresh evidence before making it: name the check, run it now, read the output, and claim only what it proved. A postponed check stays an open gap. A local pass is not a live claim. |
+| **[research](./skills/research/SKILL.md)** | Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, using a background agent when available, with fresh-session or direct-research fallbacks. This repo and the caller's evidence come first. |
 | **[tdd](./skills/tdd/SKILL.md)** | Test-driven development with a red-green loop. Builds features or fixes bugs one vertical slice at a time. |
 | **[domain-modeling](./skills/domain-modeling/SKILL.md)** | Actively build and sharpen a project's domain model by challenging terms, stress-testing with scenarios, and updating `GLOSSARY.md` and ADRs inline. |
 | **[codebase-design](./skills/codebase-design/SKILL.md)** | Shared discipline and vocabulary for designing deep modules: small interfaces, clean seams, testable through the interface. |
@@ -262,7 +262,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 | Skill | What it does |
 |---|---|
 | **[grill-me](./skills/grill-me/SKILL.md)** | Get relentlessly interviewed about a plan or design until every branch of the design tree is resolved. |
-| **[handoff](./skills/handoff/SKILL.md)** | Write the current conversation into a portable handoff document so another agent can continue the work. |
+| **[handoff](./skills/handoff/SKILL.md)** | Write the current conversation into a portable handoff document so another agent can continue the work. Reads and updates `.supermatt/session.md` so a new session resumes without being asked. |
 | **[teach](./skills/teach/SKILL.md)** | Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace. |
 | **[to-questionnaire](./skills/to-questionnaire/SKILL.md)** | Turn a decision you can't answer alone into a Markdown questionnaire for the one person who can (filled in async, or together over a meeting). |
 | **[jury](./skills/jury/SKILL.md)** | Put a hard decision to a jury of 3 or 5 seats: blind votes, one anonymous review round, and one committed verdict, or an unavailable result if no blind vote succeeds. Its external seat follows the repository peer policy, including a host-only panel. |

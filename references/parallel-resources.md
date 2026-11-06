@@ -7,4 +7,7 @@ Worktrees isolate files, but a test, build, preview, or deployment can still cha
 3. Pass the assignment and any wait condition with the task. A worker that discovers a new shared target reports it before use; the coordinator updates ownership before allowing the operation. Keep the assignment in the run's temporary state, not in project configuration committed for this run.
 4. Release ownership only after the operation and its child processes have stopped using the resource. Parking a worker or receiving its final message is insufficient. Preserve the owner and blocker when exit or cleanup is unverified. Recheck ownership after a restart before reassigning it.
 
+5. Before parallel edits, name the files, tables, and records each lane will change. Shared preparation is fine. A shared authorization or a shared write is not. Each record still needs its own permission and version check, and the write fails when that version changed.
+6. A lane that checks only the records it selected says which eligible records it left out. Exclusions already verified stay excluded on resume.
+
 Integration and shipping slots still protect their existing operations. They do not isolate databases or previews used before a merge.

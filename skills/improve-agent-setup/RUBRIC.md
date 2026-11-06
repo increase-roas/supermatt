@@ -27,7 +27,7 @@ Is each piece of work narrow enough to finish and check? Look for tasks that pul
 
 ## 5. Context
 
-Does the agent get enough input without noise? Look for steering files padded with no-ops, missing context pointers, stale paths, and long sessions that never reset between phases. A 2 needs every steering rule to change behavior and every pointer to resolve.
+Does the agent get enough input without noise? Look for steering files padded with no-ops, missing context pointers, stale paths, and long sessions that never reset between phases. A 2 needs every steering rule to change behavior and every pointer to resolve. Session size is the host's own context meter. A walk of the tree is a static audit, and only when someone asked for that audit.
 
 ## 6. Safety
 

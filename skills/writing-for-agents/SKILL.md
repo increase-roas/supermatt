@@ -88,6 +88,10 @@ You win twice: fewer tokens, and a sharper hook for the agent to hang its thinki
 
 **Negation** is the failure mode beside this lever: steering by prohibition drags the forbidden behaviour into context and makes it _more_ available, not less. _Don't think of an elephant_, and the elephant is all there is; the negation is a weak modifier the strongly-activated concept overruns, so the ban half-reads as an instruction to do the thing. Prompt the **positive**: state the target behaviour ("write one-line comments") so the banned one is never spoken. A prohibition earns its place only as a hard guardrail you cannot phrase positively; even then, pair it with the positive target so attention lands on what to do.
 
+## Before a new skill
+
+Search skills already installed and the project's skill folder for one that already does the job. Extend that skill when the trigger is the same branch. Write a new skill when the trigger is a different branch.
+
 ## Testing a skill
 
 A skill is code for an agent, so test it like code before you trust it.

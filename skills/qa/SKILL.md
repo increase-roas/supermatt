@@ -41,7 +41,8 @@ A **scenario** is one thing a user does and the result they should then see: the
 - data attacks on each new input: Goldilocks (too small, too big, just right), each boundary and one past it, 0, 1, and many items, and text with unicode, emoji, leading or trailing spaces, quotes, delimiters, and a newline;
 - CRUD on each record the change writes: create, read, update, and delete it, and follow the data to every view that shows it and through a restart;
 - a flow: the scenarios chained one after another with no reset between them, the way a user's session runs, entering and leaving each state the change adds;
-- one existing flow that shares the changed code, to catch a regression next to the change.
+- one existing flow that shares the changed code, to catch a regression next to the change;
+- when the diff changes shared client state and a control that writes it: the label's promised result against the state after every handler it calls, including a later call that resets an earlier field, an async write that finishes out of order, a handler that reads a stale value, and an effect that runs because of the write.
 
 Above the scenarios, list the change's invariants under **Never and always**: what must never happen (data lost, a file left half-written, a secret in a log) and what must always hold (the terminal restored, the old data still readable). Check them after every scenario, the unhappy ones most of all.
 
