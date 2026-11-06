@@ -271,7 +271,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 |---|---|
 | **[grilling](./skills/grilling/SKILL.md)** | Interview the user relentlessly about a plan, decision, or idea until every branch of the design tree is resolved. |
 | **[writing-for-agents](./skills/writing-for-agents/SKILL.md)** | Writing documents for agents: skills, AGENTS.md/CLAUDE.md, and any doc an agent reaches by a pointer. |
-| **[what-would-you-do](./skills/what-would-you-do/SKILL.md)** | Answer the agent's question with this one: it explains the problem, weighs each option, and recommends an answer. |
+| **[what-would-you-do](./skills/what-would-you-do/SKILL.md)** | Explain a pending question, weigh each option, recommend one, and do it when the choice is not a gate. |
 
 ## Help and status
 

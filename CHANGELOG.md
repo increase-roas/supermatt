@@ -26,6 +26,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- `what-would-you-do`: the steps now act on a non-gate recommendation. A gate still stops for the user. A jury line is offered only when they asked for one or the decision is a gate.
 - `qa`: accepts Node built-ins in the shared scratch dependency preflight, including built-in-only checks, while preserving package resolution and missing-package failures.
 - `retro`: recognizes OMP `skill-prompt` custom messages as user evidence with their original source lines while skipping other custom types and rejecting userless sessions.
 
