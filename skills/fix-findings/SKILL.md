@@ -2,7 +2,6 @@
 name: fix-findings
 description: "Apply every finding from the most recent review, audit, verification, or check in this session."
 argument-hint: "[which findings, e.g. 2-4 or S1 C1, or the findings' own text]"
-disable-model-invocation: true
 license: MIT
 ---
 

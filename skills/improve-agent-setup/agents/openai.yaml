@@ -2,4 +2,4 @@ interface:
   display_name: "SuperMatt: Improve Agent Setup"
   short_description: "Score a repo's agent setup and rank the fixes"
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

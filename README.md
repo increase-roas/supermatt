@@ -207,7 +207,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Engineering
 
-### User-invoked
+### Model-invoked
 
 | Skill | What it does |
 |---|---|
@@ -256,7 +256,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Productivity
 
-### User-invoked
+### Model-invoked
 
 | Skill | What it does |
 |---|---|

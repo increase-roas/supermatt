@@ -6,7 +6,7 @@ Every skill change must preserve the contract for Claude Code, Codex, Cursor, an
 
 ## Invocation policy
 
-- **User-invoked**: set `disable-model-invocation: true` in `SKILL.md` and `policy.allow_implicit_invocation: false` in `agents/openai.yaml`. Keep the `description` human-facing and omit trigger lists.
+- **User-invoked**: set `disable-model-invocation: true` in `SKILL.md` and `policy.allow_implicit_invocation: false` in `agents/openai.yaml`. Keep the `description` human-facing and omit trigger lists. This repo does not use that mode. The workflow skills are model-invoked so Claude, Codex, and Cursor can open them from the message.
 - **Model-invoked**: omit both fields. Keep the `description` model-facing and include the distinct triggers that justify automatic discovery.
 
 Claude Code, Codex, and Cursor enforce explicit-only metadata. OMP hides explicit-only skills from its catalog but does not make them inaccessible to a model. Treat this as discoverability policy, not authorization.

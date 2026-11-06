@@ -2,7 +2,6 @@
 name: improve-file-structure
 description: "Assess project file organization and prepare a behavior-preserving migration plan for /implement when reorganization is justified."
 argument-hint: "[path or pain point]"
-disable-model-invocation: true
 license: MIT
 ---
 

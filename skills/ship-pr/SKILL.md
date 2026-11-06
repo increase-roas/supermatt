@@ -2,7 +2,6 @@
 name: ship-pr
 description: "Commit, push, open a pull request, repair CI within bounded attempts, then squash merge and verify post-merge workflows."
 argument-hint: "[message hint]"
-disable-model-invocation: true
 compatibility: Requires git and an authenticated gh CLI.
 license: MIT
 ---

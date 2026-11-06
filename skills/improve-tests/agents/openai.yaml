@@ -2,4 +2,4 @@ interface:
   display_name: "SuperMatt: Improve Tests"
   short_description: "Cut a test suite to the tests that catch bugs"
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

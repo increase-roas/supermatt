@@ -2,7 +2,6 @@
 name: improve-architecture
 description: "Assess a codebase's architecture, stop when it is healthy, otherwise find deepening opportunities, design the chosen one, and hand a plan to /implement."
 argument-hint: "[module, subsystem, or pain point]"
-disable-model-invocation: true
 compatibility: Uses git to find hot spots.
 license: MIT
 ---

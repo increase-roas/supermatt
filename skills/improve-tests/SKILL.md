@@ -2,7 +2,6 @@
 name: improve-tests
 description: "Cut a test suite to the tests that catch real bugs and its run time to the minimum: measure first, delete or demote low-value tests, fix slow setup, and prove every cut keeps the checks that matter."
 argument-hint: "[path or area of the test suite]"
-disable-model-invocation: true
 license: MIT
 ---
 

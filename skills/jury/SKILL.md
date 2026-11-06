@@ -2,7 +2,6 @@
 name: jury
 description: "Put a question or decision to a jury of 3 or 5 subagents: blind independent votes, one anonymized review round, and a verdict with the vote, dissent, and first action when at least one blind vote succeeds."
 argument-hint: "<question or decision> [5 for a five-seat panel]"
-disable-model-invocation: true
 compatibility: Requires independent subagents. Uses the repository peer policy to keep every seat on the host or select a capability-aware Claude, Codex, Cursor Agent, or OMP adapter.
 license: MIT
 ---

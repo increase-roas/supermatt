@@ -1,7 +1,6 @@
 ---
 name: retro
 description: "Conduct a retrospective on a coding session."
-disable-model-invocation: true
 argument-hint: "[session to review, defaults to this one]"
 license: MIT
 ---

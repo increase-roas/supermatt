@@ -2,7 +2,6 @@
 name: babysit-pr
 description: "Watch a pull request until it is ready to merge: open it when the branch has none, handle review feedback before CI, recover CI within a bounded budget, keep the branch current, and stop without merging."
 argument-hint: "[PR number or URL] [duration, default 8h]"
-disable-model-invocation: true
 compatibility: Requires git, an authenticated gh CLI, and Bun or Node.js 18.17 or later (built-in modules only). GitHub only.
 license: MIT
 ---

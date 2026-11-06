@@ -2,7 +2,6 @@
 name: implement
 description: "Implement a piece of work based on a spec, tickets, or triaged issues."
 argument-hint: "[spec path, or ticket or issue references]"
-disable-model-invocation: true
 license: MIT
 ---
 

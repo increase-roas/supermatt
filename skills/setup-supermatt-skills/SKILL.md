@@ -1,7 +1,6 @@
 ---
 name: setup-supermatt-skills
 description: "Configure this repo for the engineering skills: set up its issue tracker, triage labels, domain doc layout, and external peer policy. Run once before first use of the other engineering skills."
-disable-model-invocation: true
 license: MIT
 ---
 

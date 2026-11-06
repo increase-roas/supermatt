@@ -2,7 +2,6 @@
 name: orchestrate
 description: "Work through GitHub issues or local Markdown tickets unattended in parallel lanes, with workers in Herdr panes and git worktrees."
 argument-hint: "[parallel runs]"
-disable-model-invocation: true
 compatibility: Designed for Claude Code, Codex, Cursor, and OMP. Requires the matching host CLI and Herdr integration, gh for GitHub PR shipping, and Bun or Node.js 18.17 or later (built-in modules only). Supports GitHub issues and local Markdown trackers. The notification uses osascript, so it shows on macOS only.
 license: MIT
 ---

@@ -2,7 +2,6 @@
 name: implement-spec
 description: "Implement a whole spec through parallel ticket worktrees on one integration branch."
 argument-hint: "[spec path or issue reference]"
-disable-model-invocation: true
 license: MIT
 ---
 

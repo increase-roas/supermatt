@@ -2,4 +2,4 @@ interface:
   display_name: "SuperMatt: Fix Findings"
   short_description: "Apply the findings of the last review or check"
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

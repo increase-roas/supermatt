@@ -1,7 +1,6 @@
 ---
 name: ideate
 description: Generate grounded ideas for what to build next, critique every one, and rank the survivors in a Markdown file.
-disable-model-invocation: true
 argument-hint: "[focus area or constraint]"
 license: MIT
 ---

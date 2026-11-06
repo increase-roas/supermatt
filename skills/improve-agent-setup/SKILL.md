@@ -2,7 +2,6 @@
 name: improve-agent-setup
 description: "Score a repository's agent setup across seven areas. Healthy means every area is 3. A 2 is not the finish. When an area is below 3, do the fix in the same turn."
 argument-hint: "[repo path or area]"
-disable-model-invocation: true
 license: MIT
 ---
 

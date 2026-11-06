@@ -2,7 +2,6 @@
 name: commit
 description: "Commit all changes on the current branch, main included."
 argument-hint: "[message hint]"
-disable-model-invocation: true
 license: MIT
 ---
 

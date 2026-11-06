@@ -2,7 +2,6 @@
 name: refactor
 description: "Refactor code at method, file, or project scope. Assesses first and stops when the code is already clean, routes architecture problems elsewhere, and gates edits on test coverage. Language-agnostic."
 argument-hint: "[method, file, path, or 'the changes on this branch since <ref>']"
-disable-model-invocation: true
 metadata:
   credits-skill: refactor, refactor-plan, refactor-method-complexity-reduce, reducing-entropy
   credits-author: GitHub; Leonardo Flores
