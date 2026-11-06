@@ -1,6 +1,6 @@
 ---
 name: adopt-harness
-description: "Use when Alex drops a plugin, a skill, a zip, or a link to someone else's agent harness, GitHub skill repo, or rules pack, or asks if anything in it is better than ours. Scan it and merge the better parts into our harness in the same turn. A comparison is not the finish."
+description: "Use when a GitHub harness already does it, or Alex asks what is missing. Also when he drops a plugin, skill, zip, or rules pack, or asks if anything in it is better than ours. Scan it and merge the better parts in the same turn. A comparison is not the finish."
 license: MIT
 ---
 
