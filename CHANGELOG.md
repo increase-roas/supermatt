@@ -4,7 +4,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `improve-agent-setup`: scores a repository's agent setup across seven areas with cited evidence, checks it against a list of known setup anti-patterns, stops when it is healthy, and ranks fixes into a plan for `/implement`.
+
 ### Changed
+
+- `retro`: checks friction against the known setup anti-patterns in `improve-agent-setup`.
 
 - `codebase-design`: defines data contracts, state transitions, validation ownership, concurrent writes, and recovery after duplicate or interrupted execution in a focused reference.
 - `implement`: consults the shared state-contract guidance before changing data contracts, state transitions, shared mutable state, or retryable effects.
