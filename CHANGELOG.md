@@ -25,7 +25,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `implement-spec`: gives each worker the same conditional state-contract check as `implement`.
 - `code-review`: checks duplicate execution and interruption between durable effects against the intended recovery contract. Requires verified test stores and endpoints before replay, otherwise reports a verification gap.
 - `prototype`: two rules, skills, or hooks that can send the same situation to different next steps load the logic branch before another rule or another owner is added.
-- `handoff`: a conclusion without the decision that produced it stays out, and a fact that was not re-checked is marked unverified.
+- `handoff`: a conclusion without the decision that produced it stays out, and a fact that was not re-checked is marked unverified. A checkpoint in the middle of a job already ordered is a save, then the job continues.
 - `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps. A dropped plugin, skill, zip, or harness routes to `adopt-harness`, which merges the better parts and proves each one before the commit. `improve-agent-setup` stays the score that does not edit. Project facts the code cannot show route to `project-lore`. The same conflicting-rules case routes to `prototype` and LOGIC.md.
 - `refactor`: verifies complete, runnable manual examples against automation in scratch before applying a mechanical sweep, including coupled declarations and callers.
 

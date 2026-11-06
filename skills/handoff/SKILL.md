@@ -6,7 +6,9 @@ disable-model-invocation: true
 license: MIT
 ---
 
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS, outside the current workspace. Tell the user the file's absolute path, so they can open it in the next session or send it on.
+Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS, outside the current workspace. Tell the user the file's absolute path when the job is done or a gate stops it.
+
+A checkpoint written in the middle of a job he already ordered does not end that job. Save it, then continue. Do not hand the next step back to him.
 
 Include a "suggested skills" section in the document, naming which skills the next agent should load and follow through the host's skill mechanism. For a user-invoked skill, tell the user to run `/name` in Claude linked installs or Cursor, `/supermatt:name` from the Claude plugin, `$name` in Codex, or `/skill:name` in OMP.
 
