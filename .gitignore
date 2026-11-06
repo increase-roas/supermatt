@@ -1,2 +1,4 @@
 oss-audit-report.md
 lefthook-local.yml
+__pycache__/
+*.pyc
