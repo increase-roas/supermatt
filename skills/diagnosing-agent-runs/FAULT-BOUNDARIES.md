@@ -18,6 +18,10 @@ Compare each disputed claim with the source passage the generation step actually
 
 Confirm which instructions the run actually loaded before alleging the agent ignored them. Codex reads guidance from the project root down to the launch directory, later (nearer) files winning, within its document-size cap. In each directory it takes the first nonempty file of `AGENTS.override.md`, `AGENTS.md`, then configured fallback names. Without a discovered project root, it checks only the current directory, so an `AGENTS.md` in a parent folder outside a git repository is not loaded. Claude Code's `/memory` lists instruction locations and `/context` shows what loaded at launch. `CLAUDE.md` and memory are context, not an enforced barrier. A file created mid-run is not proof it was loaded.
 
+## Context window
+
+If the trace repeats an earlier action, treats an earlier wrong claim as a fact, follows a tool or instruction the task did not need, or two loaded instructions disagree, the fault is the window. Name which: poisoning (a wrong fact kept being reused), distraction (the run repeats earlier actions as the window fills), confusion (an unused tool or instruction got used), or clash (two loaded instructions disagree). The repair is a handoff of the objective, the decisions, and the failed attempts, then the same task in a fresh session. Mark a fact you did not re-check as unverified. Do not add a line to an always-loaded file to paper over it, and do not stack a third correction in the same window.
+
 ## Permissions
 
 In the Claude Agent SDK, `allowedTools` adds auto-approval rules; tools it does not list can still be available. A bare `disallowedTools` entry removes a tool; a scoped deny pattern keeps the tool and denies matching calls. `canUseTool` runs only when earlier permission steps leave a call unresolved, and a `PreToolUse` hook is the documented gate before every call. Identify which step decided the call; do not assume a callback saw every action. In Codex, a hook runs only when it is both enabled and trusted.
@@ -32,4 +36,4 @@ Separate the transcript from the outcome in the environment. Verify the file con
 
 ## Attribution
 
-Adapted from Sergey Skripko's [agent-debugging](https://github.com/grayskripko/marketing-skills) plugin (MIT, version 0.1.1). See [THIRD-PARTY-NOTICES.md](../../THIRD-PARTY-NOTICES.md).
+Adapted from Sergey Skripko's [agent-debugging](https://github.com/grayskripko/marketing-skills) plugin (MIT, version 0.1.1). The context-window names are from Drew Breunig's *How Long Contexts Fail* (2025), as collected in the dropped context-engineering snapshot. See [THIRD-PARTY-NOTICES.md](../../THIRD-PARTY-NOTICES.md).

@@ -109,6 +109,12 @@ Done when **every remaining element is load-bearing**: removing any one of them 
 
 Do not proceed until you have reproduced **and** minimised.
 
+### Where it breaks
+
+When the red path crosses more than one component, one probe run logs what enters and what leaves each boundary before you rank hypotheses. The first boundary whose output is already wrong is the component you investigate. Do not rank hypotheses about a later layer.
+
+When the failure appears only inside the suite, run the tests one file at a time until the first file that leaves the bad state. That file is the trigger.
+
 ## Phase 3: Hypothesise
 
 First, **audit your assumptions**: list the beliefs your picture of the bug depends on (this function returns what its name says, the config loads before this runs, the caller passes a non-null value) and mark each _verified_ (you read it, ran it, or checked state) or _assumed_. Many wrong hypotheses are right ones tested against a wrong assumption.
@@ -148,7 +154,7 @@ A tagged probe that prints nothing was most likely never reached. Before you cha
 
 ### Completion criterion: a causal chain with no gaps
 
-Phase 4 is done when you can state the chain from trigger to symptom, each step with a `file:line` and an observed value that confirms it. "Somehow X leads to Y" is a gap: go back and probe it. No complete chain, no Phase 5.
+Phase 4 is done when you can state the chain from trigger to symptom, each step with a `file:line` and an observed value that confirms it. "Somehow X leads to Y" is a gap: go back and probe it. Keep walking callers until the line that created the bad value. The line that throws is not the source when the bad value was passed in. No complete chain, no Phase 5.
 
 ## Phase 5: Fix + regression test
 

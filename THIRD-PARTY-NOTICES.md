@@ -90,7 +90,7 @@ SOFTWARE.
 
 # Superpowers attribution
 
-`verifying-completion`, the external-feedback check in `fix-findings`, and skill testing in `writing-for-agents` adapt ideas from [Superpowers](https://github.com/obra/superpowers) (its verification-before-completion, receiving-code-review, and writing-skills skills), rewritten for SuperMatt.
+`verifying-completion`, the external-feedback check in `fix-findings`, and skill testing in `writing-for-agents` adapt ideas from [Superpowers](https://github.com/obra/superpowers) (its verification-before-completion, receiving-code-review, and writing-skills skills), rewritten for SuperMatt. The boundary probe and the backward trace in `diagnosing-bugs` adapt its systematic-debugging skill and root-cause-tracing note (MIT). The stop-and-ask-the-user steps and the extra validation layers were left out.
 
 Superpowers' license follows.
 

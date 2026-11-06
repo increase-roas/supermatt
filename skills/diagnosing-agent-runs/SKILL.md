@@ -31,7 +31,7 @@ Done when: you can point to one event (file and line, or call ID) where the run 
 
 ## Phase 2: Test the fault boundary
 
-Match the deviation to one boundary in [FAULT-BOUNDARIES.md](FAULT-BOUNDARIES.md): tool choice and arguments, protocol versus tool errors, wrong answers from retrieval, instruction loading, permissions, runtime limits and state, or claimed completion. Test that boundary against the supplied record. Do not inventory layers the evidence does not touch.
+Match the deviation to one boundary in [FAULT-BOUNDARIES.md](FAULT-BOUNDARIES.md): tool choice and arguments, protocol versus tool errors, wrong answers from retrieval, instruction loading, the context window, permissions, runtime limits and state, or claimed completion. Test that boundary against the supplied record. Do not inventory layers the evidence does not touch.
 
 State each remaining explanation as a falsifiable prediction ("if the tool schema dropped `limit`, the call at line 212 will lack it"), the same way `diagnosing-bugs` does, and name the check that separates them.
 
