@@ -10,6 +10,8 @@ license: MIT
 
 Score how well a repository supports the coding agents that work in it, then name the few changes that would help most. Where `retro` learns from one finished session, this skill surveys the whole repository: its steering files, skills, checks, and conventions, whether or not a session has gone wrong yet. It changes no project files. End with a ranked plan for `/implement`, or a healthy verdict.
 
+If the input is someone else's plugin, skill, zip, or a link to their harness, this is the wrong skill. Load `adopt-harness`. That one merges the better parts into our harness in the same turn.
+
 ## Principles
 
 - **Evidence over checklists.** Every score cites a path, a line, a command output, or the absence of something you looked for. A rubric row you cannot ground stays **unscored**, not guessed.

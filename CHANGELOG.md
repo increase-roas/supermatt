@@ -6,9 +6,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `adopt-harness`: scans a dropped plugin, skill, zip, or someone else's harness and merges the better parts into our harness in the same turn. A comparison is not the finish. Gates stay as they are.
 - `verifying-completion`: proves a completion claim with a fresh check before making it, for work outside the main flow. Adapted from Superpowers' verification-before-completion (MIT).
 - `diagnosing-agent-runs`: diagnoses, repairs, and verifies a failed AI agent run from its traces, logs, and config, with runtime fault boundaries for tool schemas, MCP errors, retrieval, instruction loading, permissions, turn limits, and resume. Adapted from Sergey Skripko's agent-debugging plugin (MIT).
-- `improve-agent-setup`: scores a repository's agent setup across seven areas with cited evidence, checks it against a list of known setup anti-patterns, stops when it is healthy, and ranks fixes into a plan for `/implement`. The structure score looks for the start-file sections in `writing-for-agents`.
+- `improve-agent-setup`: scores a repository's agent setup across seven areas with cited evidence, checks it against a list of known setup anti-patterns, stops when it is healthy, and ranks fixes into a plan for `/implement`. The structure score looks for the start-file sections in `writing-for-agents`. A dropped plugin, skill, or harness is `adopt-harness`, not this score.
 
 ### Changed
 
@@ -21,7 +22,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `implement`: consults the shared state-contract guidance before changing data contracts, state transitions, shared mutable state, or retryable effects.
 - `implement-spec`: gives each worker the same conditional state-contract check as `implement`.
 - `code-review`: checks duplicate execution and interruption between durable effects against the intended recovery contract. Requires verified test stores and endpoints before replay, otherwise reports a verification gap.
-- `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps.
+- `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps. A dropped plugin, skill, zip, or harness routes to `adopt-harness`, which merges the better parts in the same turn. `improve-agent-setup` stays the score that does not edit.
 - `refactor`: verifies complete, runnable manual examples against automation in scratch before applying a mechanical sweep, including coupled declarations and callers.
 
 ### Fixed

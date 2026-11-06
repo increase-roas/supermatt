@@ -1,0 +1,5 @@
+interface:
+  display_name: "SuperMatt: Adopt a Harness"
+  short_description: "Scan a dropped plugin or skill pack and merge the better parts"
+policy:
+  allow_implicit_invocation: true
