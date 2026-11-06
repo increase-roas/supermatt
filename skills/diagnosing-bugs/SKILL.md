@@ -12,15 +12,17 @@ license: MIT
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
+**Auto-fix (Alex 2026-11-06).** A failure is fixed in this turn. Do not stop to ask which seam to use, what was tried, or whether to continue. When the cause depends on a product, an API, a version, or a platform limit, run `research-with-sources`: Exa, and that company's official docs (the Composio docs reader for that library, otherwise the company's own docs). Then fix it and say what changed in one line.
+
 When exploring the codebase, read the glossary (`docs/agents/domain.md` gives the layout; by default `GLOSSARY.md` at the root, if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
-**Start from prior attempts.** If the user says they have been trying, ask what they tried before you start, so you skip their dead ends. If they link an issue, read the whole thread, latest comments first: they often carry newer repro steps or a different suspect. Run `git log --oneline -10 -- <file>` on the files you read to see what changed recently.
+**Start from prior attempts.** If the user says they have been trying, read the thread and `git log` for what they tried. Do not ask. If they link an issue, read the whole thread, latest comments first: they often carry newer repro steps or a different suspect. Run `git log --oneline -10 -- <file>` on the files you read to see what changed recently.
 
 ## Redact
 
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first**: write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
 
-If the redacted output is not enough to diagnose the bug, say so and ask the user.
+If the redacted output is not enough to diagnose the bug, scan Exa and that company's official docs, then keep going.
 
 ## Phase 1: Build a feedback loop
 
@@ -28,7 +30,7 @@ If the redacted output is not enough to diagnose the bug, say so and ask the use
 
 Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
 
-Before writing a feedback-loop test, use a seam named in the spec or issue or explicitly confirmed by the user. Obtain confirmation for a newly discovered seam first, including when the test is only a temporary reproduction. While approval is pending, use a non-test reproduction such as a direct CLI or HTTP call. The Phase 5 gate applies here too.
+Before writing a feedback-loop test, use a seam named in the spec or issue. A newly discovered seam is the seam you test. Do not wait for confirmation. The Phase 5 gate applies here too.
 
 ### Ways to construct one, in roughly this order
 
@@ -41,7 +43,7 @@ Before writing a feedback-loop test, use a seam named in the spec or issue or ex
 7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
 8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
-10. **HITL shell script.** Last resort. If a human must click, drive _them_ with [`scripts/hitl-loop.template.sh`](scripts/hitl-loop.template.sh) (bundled with this skill) so the loop is still structured: copy it, edit the steps, and ask the user to run it in their own terminal (in Claude Code, `! sh <path>` puts the output in the session). It reads from a TTY, so do not run it yourself. The printed `--- Captured ---` block feeds back to you.
+10. **A click only a person can do.** Last resort. Drive it with computer use, or the browser on a web page, through the screen that shows the failure. Do not hand over a script to run.
 
 Build the right feedback loop, and the bug is 90% fixed.
 
@@ -170,11 +172,11 @@ If a correct seam exists:
 
 Revert it. State which evidence ruled the hypothesis out, then return to Phase 3 for a new hypothesis with its own prediction. A variant of the same theory ("maybe the other branch") is the same hypothesis.
 
-After **2-3 dead hypotheses or 3 failed fixes**, the diagnosis is what is wrong. Match the pattern and show it to the user before you continue:
+After **2-3 dead hypotheses or 3 failed fixes**, the diagnosis is what is wrong. Match the pattern, scan Exa and that company's official docs, then continue:
 
 | Pattern | Diagnosis | Next move |
 | --- | --- | --- |
-| Hypotheses point at different subsystems | Design problem, not a local bug | Stop, present the findings, and suggest `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP |
+| Hypotheses point at different subsystems | Design problem, not a local bug | Load `improve-architecture`, then keep fixing. Tell him the pattern in one line |
 | Evidence contradicts itself | Wrong mental model of the code | Re-read the path from its entry point, assuming nothing |
 | Works locally, fails in CI/prod | Environment difference | Compare config, dependencies, data, timing |
 | Fix works but the prediction was wrong | Symptom fix; the cause is still active | Keep investigating |

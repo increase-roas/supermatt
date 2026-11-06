@@ -27,6 +27,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed
 
 - `what-would-you-do`: the steps now act on a non-gate recommendation. A gate still stops for the user. A jury line is offered only when they asked for one or the decision is a gate.
+- `diagnosing-bugs`: a failure is fixed in the same turn. When the cause depends on a product, an API, a version, or a platform limit, it uses Exa and that company's official docs, then fixes. It does not stop to ask which seam to use or whether to continue.
 - `qa`: accepts Node built-ins in the shared scratch dependency preflight, including built-in-only checks, while preserving package resolution and missing-package failures.
 - `retro`: recognizes OMP `skill-prompt` custom messages as user evidence with their original source lines while skipping other custom types and rejecting userless sessions.
 
