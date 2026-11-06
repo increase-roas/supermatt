@@ -1,0 +1,5 @@
+interface:
+  display_name: "SuperMatt: Doctor"
+  short_description: "One command that clears leftover folders"
+policy:
+  allow_implicit_invocation: true
