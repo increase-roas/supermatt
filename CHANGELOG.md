@@ -6,11 +6,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `verifying-completion`: proves a completion claim with a fresh check before making it, for work outside the main flow. Adapted from Superpowers' verification-before-completion (MIT).
 - `diagnosing-agent-runs`: diagnoses, repairs, and verifies a failed AI agent run from its traces, logs, and config, with runtime fault boundaries for tool schemas, MCP errors, retrieval, instruction loading, permissions, turn limits, and resume. Adapted from Sergey Skripko's agent-debugging plugin (MIT).
 - `improve-agent-setup`: scores a repository's agent setup across seven areas with cited evidence, checks it against a list of known setup anti-patterns, stops when it is healthy, and ranks fixes into a plan for `/implement`.
 
 ### Changed
 
+- `fix-findings`: verifies each finding from outside SuperMatt's own review against the code before fixing it, skips wrong ones with evidence, and asks about unclear ones. Adapted from Superpowers' receiving-code-review (MIT).
+- `writing-for-agents`: adds testing a skill against a recorded baseline failure, a pressure rerun, and a trigger check. Adapted from Superpowers' writing-skills (MIT).
 - `retro`: checks friction against the known setup anti-patterns in `improve-agent-setup`.
 
 - `codebase-design`: defines data contracts, state transitions, validation ownership, concurrent writes, and recovery after duplicate or interrupted execution in a focused reference.

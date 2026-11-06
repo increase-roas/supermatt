@@ -74,6 +74,18 @@ You win twice: fewer tokens, and a sharper hook for the agent to hang its thinki
 
 **Negation** is the failure mode beside this lever: steering by prohibition drags the forbidden behaviour into context and makes it _more_ available, not less. _Don't think of an elephant_, and the elephant is all there is; the negation is a weak modifier the strongly-activated concept overruns, so the ban half-reads as an instruction to do the thing. Prompt the **positive**: state the target behaviour ("write one-line comments") so the banned one is never spoken. A prohibition earns its place only as a hard guardrail you cannot phrase positively; even then, pair it with the positive target so attention lands on what to do.
 
+## Testing a skill
+
+A skill is code for an agent, so test it like code before you trust it.
+
+1. **Baseline first.** Give a fresh agent, without the skill, a realistic task the skill is meant to change. Record what it does wrong, in its own words. That failure is the test the skill must turn green; a skill written without one is guessing at a problem.
+2. **Write against the failure.** Address the observed mistakes, not imagined ones. Each instruction should map to something the baseline got wrong.
+3. **Rerun with the skill,** in a fresh context, on the same task. It passes when the recorded mistakes are gone and nothing new broke.
+4. **Pressure it.** Rerun under the conditions that make agents cut corners: a deadline, a user pushing to skip a step, a long session, an easy-looking shortcut. Any rationalization the agent uses to skip a step becomes a line the skill answers directly.
+5. **Check the trigger.** Ask for the task in ordinary words, and once for a nearby task the skill should not take. The description should catch the first and leave the second alone.
+
+Loading cleanly or passing a validator proves the skill parses, not that it changes behavior.
+
 ## Pruning
 
 - Keep each meaning in a **single source of truth**: one authoritative place, so changing the behaviour is a one-place edit. **Duplication** (the same meaning in more than one place) costs maintenance and tokens, and inflates a meaning's prominence on the ladder past its real rank. (The accidental inverse of a leading word, which repeats a token on purpose, never the meaning.)
