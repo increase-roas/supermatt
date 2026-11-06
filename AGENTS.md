@@ -23,3 +23,21 @@ The `CHANGELOG.md` Unreleased section keeps one entry per skill: fold a new chan
 To (re)link every skill into the local harness skill directories (`~/.claude/skills`, `~/.agents/skills`), run `scripts/link-skills.sh`. Each entry is a symlink into this repo, so a `git pull` keeps installed skills current; re-run the script after adding, removing, or renaming a skill. The script only links current skills. After a removal or rename, inspect the old links and retire only confirmed stale symlinks whose targets belong to this checkout. Leave unrelated links intact; the maintainer-only linker stays unchanged.
 
 No em-dashes anywhere in this repo's prose (`SKILL.md` files, docs, `README.md`, `CHANGELOG.md`, ADRs, changesets, code comments). Where a sentence reaches for one, rewrite it instead with a comma, colon, period, parentheses, or a conjunction, whichever the sentence actually wants; never do a blind character substitution.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub issues in this repo. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The seven default roles, each label equal to its name. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context. See `docs/agents/domain.md`.
+
+### External peers
+
+`auto`. See `docs/agents/cross-model.json`.
