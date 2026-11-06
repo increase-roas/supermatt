@@ -13,7 +13,7 @@ license: MIT
 
 Improve code structure without changing behavior. Works at three scopes: **project**, **file**, or **method**. Starts by assessing whether refactoring is even warranted: if the code is already clean, say so and stop.
 
-**Refactoring vs architecture:** this skill handles code-level improvements: complexity, duplication, naming, dead code, method extraction. If the assessment shows that the real problem is module boundaries, coupling between packages, or shallow modules that need deepening, say so. That is an architecture problem this skill won't fix: tell the user to run `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP.
+**Refactoring vs architecture:** this skill handles code-level improvements: complexity, duplication, naming, dead code, method extraction. If the assessment shows that the real problem is module boundaries, coupling between packages, or shallow modules that need deepening, say so. That is an architecture problem this skill won't fix: load and follow the `improve-architecture` skill through the host's skill mechanism.
 
 ## Philosophy
 

@@ -9,7 +9,7 @@ license: MIT
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-Read `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`. If either is missing or unreadable, stop and tell the user to run `/setup-supermatt-skills` in Claude linked installs or Cursor, `/supermatt:setup-supermatt-skills` from the Claude plugin, `$setup-supermatt-skills` in Codex, or `/skill:setup-supermatt-skills` in OMP. Resume only after both required docs exist and have been read.
+Read `docs/agents/issue-tracker.md` and `docs/agents/triage-labels.md`. If either is missing or unreadable, stop and load and follow the `setup-supermatt-skills` skill through the host's skill mechanism. Resume only after both required docs exist and have been read.
 
 ## Process
 

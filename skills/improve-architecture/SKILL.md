@@ -15,7 +15,7 @@ This skill is built on a shared vocabulary and informed by the project's domain 
 - Load and follow the `codebase-design` skill through the host's skill mechanism first. Use its terms exactly (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**, **information leakage**) and don't drift into "component," "service," "API," or "boundary." Its `RED-FLAGS.md` names structural defects, its `DEEPENING.md` holds the dependency categories and seam discipline, and its `DESIGN-IT-TWICE.md` holds the parallel interface design.
 - The domain language in `GLOSSARY.md` gives names to good seams; ADRs record decisions this skill should not re-litigate. `docs/agents/domain.md` gives where both live (by default `GLOSSARY.md` and `docs/adr/` at the root).
 
-**Architecture vs refactoring:** this skill handles structural changes: module boundaries, interfaces, testability. If the problem is code-level (complexity, duplication, naming, dead code within a well-bounded module), that's refactoring: tell the user to run `/refactor` in Claude linked installs or Cursor, `/supermatt:refactor` from the Claude plugin, `$refactor` in Codex, or `/skill:refactor` in OMP. The same applies after an architectural change lands: cleaning up the new module's internals is a separate refactoring pass.
+**Architecture vs refactoring:** this skill handles structural changes: module boundaries, interfaces, testability. If the problem is code-level (complexity, duplication, naming, dead code within a well-bounded module), that's refactoring: load and follow the `refactor` skill through the host's skill mechanism. The same applies after an architectural change lands: cleaning up the new module's internals is a separate refactoring pass.
 
 ## Guardrails
 

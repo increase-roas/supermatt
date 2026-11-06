@@ -20,7 +20,7 @@ Claude Code, Codex, and Cursor enforce explicit-only skill metadata. OMP maps `d
 
 ### Orchestrator dispatch
 
-An explicit human invocation of `orchestrate` delegates these user-invoked commands to that run's assigned workers: `triage`, `implement`, `fix-findings`, `commit`, `refactor`, `ship-pr`, `retro`, and `what-would-you-do`. Send them as explicit worker prompts using the human invocation forms above, not as implicit model-side dependencies. Keep their frontmatter and Codex invocation policies unchanged.
+An explicit `orchestrate` run delegates these skills to that run's assigned workers: `triage`, `implement`, `fix-findings`, `commit`, `refactor`, `ship-pr`, `retro`, and `what-would-you-do`. The worker loads and follows each one through the host's skill mechanism. Other flows do the same handoff. Do not tell the user to type the next skill.
 
 Each dispatch stays within the run's assigned issue, worktree, phase, and approval scope. Pass that scope and relevant prior evidence to a fresh worker. This exception ends with the run and does not authorize other user-invoked skills, unrelated work, or dispatch by another caller.
 

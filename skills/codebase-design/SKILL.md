@@ -12,7 +12,7 @@ license: MIT
 
 Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. Use this language and these principles wherever code is being designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 
-To survey a whole codebase for deepening opportunities, tell the user to run `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP.
+To survey a whole codebase for deepening opportunities, load and follow the `improve-architecture` skill through the host's skill mechanism.
 
 ## Glossary
 

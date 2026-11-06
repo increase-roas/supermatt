@@ -9,7 +9,7 @@ license: MIT
 
 Measure a test suite, find the tests that cost time and catch nothing, find the setup that wastes time, and cut both. The goal is the shortest run that still catches the bugs this project actually makes. Starts from a measured baseline and an assessment: if the suite is already lean, say so and stop.
 
-Test files are the target, so editing and deleting them is expected. Production code changes only where a test needs a seam (Step 7), and only as the approved plan names it. If a cheap test is impossible because module boundaries are wrong across several modules, that is architecture work: say so, and tell the user to run `/improve-architecture` in Claude linked installs or Cursor, `/supermatt:improve-architecture` from the Claude plugin, `$improve-architecture` in Codex, or `/skill:improve-architecture` in OMP.
+Test files are the target, so editing and deleting them is expected. Production code changes only where a test needs a seam (Step 7), and only as the approved plan names it. If a cheap test is impossible because module boundaries are wrong across several modules, that is architecture work: say so, and load and follow the `improve-architecture` skill through the host's skill mechanism.
 
 ## Principles
 

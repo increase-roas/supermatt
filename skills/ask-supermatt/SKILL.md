@@ -38,7 +38,7 @@ When the issues are triaged and you want the queue worked without you, **`/orche
 
 Claude Code and Codex keep their phase-specific model policies. Cursor and OMP inherit the active session's authoritative model ID, or the harness default when that ID is unavailable. Cursor and OMP require matching Herdr integrations for durable session evidence and discoverable SuperMatt skills. Shipping includes bounded CI recovery and follow-up repair PRs for failed post-merge workflows. A default-branch failure holds further merges until recovery succeeds; exhausted recovery parks with evidence. Shipping keeps the active worktree through verification and reporting; the orchestrator stops the worker before removing that worktree.
 
-An explicit `/orchestrate` invocation delegates its listed user-invoked worker commands only within that run, under the [orchestrator dispatch contract](../../references/harnesses.md#orchestrator-dispatch). It leaves their invocation policies and safety gates unchanged; this exception does not let other flows invoke user-only skills.
+An explicit `orchestrate` run delegates its listed worker skills only within that run, under the [orchestrator dispatch contract](../../references/harnesses.md#orchestrator-dispatch). Every other flow loads the next skill through the host's skill mechanism. Do not tell the user to type it. Safety gates stay as they are.
 
 ### Context hygiene
 

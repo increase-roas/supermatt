@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- A skill that used to tell the user to type the next command now loads that skill. The chain is the same one already named in `ask-supermatt`: spec, tickets, implement, qa, review, ship.
 - Workflow skills are model-invoked. `disable-model-invocation` is off and `allow_implicit_invocation` is true, so Claude, Codex, and Cursor can open them from the message.
 - `domain-modeling`: a glossary term can point at the type that implements it, list accepted synonyms on `_Aka_`, and carry one example when two nearby concepts get confused. A renamed term stays, marked obsolete, and points at the new term. Adapted from mukiwu/muki-ai-plugins lore glossary (MIT). The term list stays in `GLOSSARY.md`.
 - `what-would-you-do`: model-invoked, so an agent about to ask a non-gate question answers it this way and acts on the recommendation.
