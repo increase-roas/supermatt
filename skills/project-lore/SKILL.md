@@ -18,7 +18,7 @@ Before a plan or a bug fix, when `docs/lore/` exists. Read `docs/lore/README.md`
 
 ## Capture
 
-When you learn a pitfall, an intentional behavior, an API quirk, or the why behind a decision. Run the boundary test first. If an entry already covers it, update that entry. If `docs/lore/` does not exist yet, create the folder, a `README.md` index, and one area taken from the top-level part of the code you are in. Add a new area to the index in the same change. Do not overwrite an entry that is already there.
+When you learn a pitfall, an intentional behavior, an API quirk, or the why behind a decision. Run the boundary test first. If an entry already covers it, update that entry. A failure lesson records the recognizable signal and the rule that should fire next time. A diary of the incident does not. If `docs/lore/` does not exist yet, create the folder, a `README.md` index, and one area taken from the top-level part of the code you are in. Add a new area to the index in the same change. Do not overwrite an entry that is already there.
 
 ## Guard
 

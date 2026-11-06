@@ -28,3 +28,11 @@ Before any claim that something is done, fixed, passing, or working:
 ## Proportion
 
 One check per claim, the cheapest one that can go red on it. Do not stack a second check for reassurance once the first decisively passed, and do not substitute a weaker check (a parse, a dry run, a log line reading `ok`) for the one that touches the real outcome.
+
+## A skipped check stays open
+
+A claim waits when the reason it would pass is that a check was postponed. "Skip tests for now", "pre-existing", "good enough", "I'll verify later", and "the tests are flaky, ignore them" are that postpone. Run the check, or state the claim as not done and name the gap.
+
+A local pass supports a local claim. A claim about deployed, live, or production behavior uses a check against that environment. Otherwise say the target was not checked.
+
+When the claim is that a code change is ready, the check is the project's command that fails if this change is wrong. Reading that diff, a secret, a token, or a debug print this change adds (`console.log`, `debugger`, or a print of a credential) means the claim waits until that line is gone. That read is part of the ready claim, not a second check after a green suite.

@@ -1,6 +1,6 @@
 ---
 name: retro
-description: "Conduct a retrospective on a coding session."
+description: "Conduct a retrospective on a coding session. Use after a session that went badly, when the same mistake happened twice, or when the user asks for a retro or what the agent setup should change."
 argument-hint: "[session to review, defaults to this one]"
 license: MIT
 ---
@@ -38,7 +38,7 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 
 4. Filter the candidates. Keep only **grounded** ones: the candidate names the moment in the session where the friction showed (a call, an error, a correction), or, for the no-guardrail finding, cites the inspected check configuration and absence of a hook or CI job running it. When it cites a steering file, the section around the cited line governs the path the session took, and when it changes a file outside the repo, that file is its **source** (see _Outside the repo_). Then keep one only if a future agent would plausibly repeat the mistake without the change, and the lesson is not already recoverable from the code, tests, types, comments, or existing docs. How long the session took or how bad it felt does not qualify a candidate. When a candidate touches an existing rule, doc, or check that was wrong or incomplete, amend that artifact instead of adding a new one.
 
-5. Present the surviving candidates to the user, in order of severity. If none survive, say so and name why each was dropped.
+5. When a kept candidate is a pitfall or a why the code cannot show, load `project-lore` and record it in the same turn. The entry carries the recognizable signal and the rule, not a diary of the incident. Then present the surviving candidates to the user, in order of severity. If none survive, say so and name why each was dropped.
 
 ## Reference
 

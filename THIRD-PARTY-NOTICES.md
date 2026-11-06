@@ -1,6 +1,6 @@
 # ECC attribution
 
-Selected workflow ideas and native discovery techniques were adapted from [ECC](https://github.com/affaan-m/ecc/tree/ef648e01899ba3e8dc6371642deaaf64b4477775), especially its research, session handoff, parallel execution, contract-first, benchmark optimization, click-path audit, and context-profile evaluation material. SuperMatt implements these as focused changes to existing skills and maintainer checks. It does not install ECC or its hooks.
+Selected workflow ideas and native discovery techniques were adapted from [ECC](https://github.com/affaan-m/ecc/tree/ef648e01899ba3e8dc6371642deaaf64b4477775), especially its research, session handoff, parallel execution, contract-first, benchmark optimization, click-path audit, and context-profile evaluation material. A later pass on 2026-11-06, ECC commit `b38be6a` (same MIT license), filled gaps a beginner hits when they never type a command: resume from `.supermatt/session.md`, a ready claim that names a skipped check, search before a new helper, leave lint and CI config alone, and trace shared UI state. SuperMatt implements these as focused changes to existing skills and maintainer checks. It does not install ECC or its hooks.
 
 ECC's license at that revision follows.
 

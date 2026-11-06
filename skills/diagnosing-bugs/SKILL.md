@@ -1,6 +1,6 @@
 ---
 name: diagnosing-bugs
-description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow.
+description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow, when a build or typecheck fails as a list of errors, or when someone asks for a repeating agent loop.
 metadata:
   credits-skill: ce-debug
   credits-author: Every
@@ -13,6 +13,10 @@ license: MIT
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
 **Auto-fix (Alex 2026-11-06).** A failure is fixed in this turn. Do not stop to ask which seam to use, what was tried, or whether to continue. When the cause depends on a product, an API, a version, or a platform limit, run `research-with-sources`: Exa, and that company's official docs (the Composio docs reader for that library, otherwise the company's own docs). Then fix it and say what changed in one line.
+
+When the only symptom is a list of compiler or type errors, fix the first error, rerun that same command, and repeat. A redesign waits until one error is a design problem, not a missing import. Before adding a package to fix it, search for one that already does the job, then load `dependency-vetting`.
+
+A repeating agent loop needs a stop a machine can decide, a retry cap, and a check the loop cannot satisfy by editing the check. Set the cap before the first run. A vague goal is not a loop: name a check that can fail, or do the next concrete action. A dev server the loop needs runs in the background or in tmux, with its log readable.
 
 When exploring the codebase, read the glossary (`docs/agents/domain.md` gives the layout; by default `GLOSSARY.md` at the root, if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
@@ -170,7 +174,7 @@ A correct seam is one where the test exercises the **real bug pattern** as it oc
 
 If a correct seam exists:
 
-1. A seam is pre-agreed only if the spec or issue names it or the user explicitly confirmed it. Obtain confirmation for a newly discovered seam before writing tests. Then load and follow the `tdd` skill through the host's skill mechanism and turn the minimised repro into its failing test at that seam.
+1. The seam this diagnosis reached is the seam you test. Do not wait for confirmation. Then load and follow the `tdd` skill through the host's skill mechanism and turn the minimised repro into its failing test at that seam. The seam is already confirmed by this diagnosis, so `tdd`'s confirm step is satisfied.
 2. Apply the fix, and only the fix. A refactor bundled in hides which change turned the loop green.
 3. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
 
