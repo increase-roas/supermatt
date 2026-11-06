@@ -1,8 +1,7 @@
 ---
 name: what-would-you-do
-description: "Explain the question you just asked and recommend an answer, with the case for and against each option."
+description: "Explain a pending question or decision and recommend an answer, with the case for and against each option. Use when the user asks what you would do, or when you are about to ask the user a non-gate question: answer it yourself this way and act on the recommendation."
 argument-hint: "[which question, or the part I do not follow]"
-disable-model-invocation: true
 license: MIT
 ---
 

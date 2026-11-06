@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `what-would-you-do`: model-invoked, so an agent about to ask a non-gate question answers it this way and acts on the recommendation.
 - `fix-findings`: verifies each finding from outside SuperMatt's own review against the code before fixing it, skips wrong ones with evidence, and asks about unclear ones. Adapted from Superpowers' receiving-code-review (MIT).
 - `writing-for-agents`: adds testing a skill against a recorded baseline failure, a pressure rerun, and a trigger check. Adapted from Superpowers' writing-skills (MIT).
 - `retro`: checks friction against the known setup anti-patterns in `improve-agent-setup`.

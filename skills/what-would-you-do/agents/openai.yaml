@@ -2,4 +2,4 @@ interface:
   display_name: "SuperMatt: What Would You Do"
   short_description: "Explain the open question and recommend an answer"
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

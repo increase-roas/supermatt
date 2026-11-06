@@ -262,7 +262,6 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 | **[handoff](./skills/handoff/SKILL.md)** | Write the current conversation into a portable handoff document so another agent can continue the work. |
 | **[teach](./skills/teach/SKILL.md)** | Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace. |
 | **[to-questionnaire](./skills/to-questionnaire/SKILL.md)** | Turn a decision you can't answer alone into a Markdown questionnaire for the one person who can (filled in async, or together over a meeting). |
-| **[what-would-you-do](./skills/what-would-you-do/SKILL.md)** | Answer the agent's question with this one: it explains the problem, weighs each option, and recommends an answer. |
 | **[jury](./skills/jury/SKILL.md)** | Put a hard decision to a jury of 3 or 5 seats: blind votes, one anonymous review round, and one committed verdict, or an unavailable result if no blind vote succeeds. Its external seat follows the repository peer policy, including a host-only panel. |
 | **[wait-what](./skills/wait-what/SKILL.md)** | Fire this the moment a message doesn't land. The agent re-pitches it with the context you're missing, in plain English, using your `GLOSSARY.md` vocabulary. |
 
@@ -272,6 +271,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 |---|---|
 | **[grilling](./skills/grilling/SKILL.md)** | Interview the user relentlessly about a plan, decision, or idea until every branch of the design tree is resolved. |
 | **[writing-for-agents](./skills/writing-for-agents/SKILL.md)** | Writing documents for agents: skills, AGENTS.md/CLAUDE.md, and any doc an agent reaches by a pointer. |
+| **[what-would-you-do](./skills/what-would-you-do/SKILL.md)** | Answer the agent's question with this one: it explains the problem, weighs each option, and recommends an answer. |
 
 ## Help and status
 
