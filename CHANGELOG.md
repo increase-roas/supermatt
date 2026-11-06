@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `project-lore`: reads `docs/lore/` before a plan or a bug fix, records a pitfall or a why the code cannot show, and checks a diff against `code:` paths before a commit. Vocabulary stays in `GLOSSARY.md`. Adapted from mukiwu/muki-ai-plugins lore (MIT): the consult, capture, and guard loop. Their glossary skill is left out because `domain-modeling` already owns it.
 - `adopt-harness`: scans a dropped plugin, skill, zip, or someone else's harness and merges the better parts into our harness in the same turn. A comparison is not the finish. Gates stay as they are. Each taken piece is proven before the commit: a skill through the writing-for-agents test, a gate through its suite, a routing line by reading the rebuilt file, and code through the project's test, `qa`, and `code-review`. The diff is reviewed for the action, one owner, the gates, the trigger, the check, and the leftovers. A piece whose check could not run stays uncommitted.
 - `verifying-completion`: proves a completion claim with a fresh check before making it, for work outside the main flow. Adapted from Superpowers' verification-before-completion (MIT).
 - `diagnosing-agent-runs`: diagnoses, repairs, and verifies a failed AI agent run from its traces, logs, and config, with runtime fault boundaries for tool schemas, MCP errors, retrieval, instruction loading, permissions, turn limits, and resume. Adapted from Sergey Skripko's agent-debugging plugin (MIT).
@@ -22,7 +23,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `implement`: consults the shared state-contract guidance before changing data contracts, state transitions, shared mutable state, or retryable effects.
 - `implement-spec`: gives each worker the same conditional state-contract check as `implement`.
 - `code-review`: checks duplicate execution and interruption between durable effects against the intended recovery contract. Requires verified test stores and endpoints before replay, otherwise reports a verification gap.
-- `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps. A dropped plugin, skill, zip, or harness routes to `adopt-harness`, which merges the better parts and proves each one before the commit. `improve-agent-setup` stays the score that does not edit.
+- `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps. A dropped plugin, skill, zip, or harness routes to `adopt-harness`, which merges the better parts and proves each one before the commit. `improve-agent-setup` stays the score that does not edit. Project facts the code cannot show route to `project-lore`.
 - `refactor`: verifies complete, runnable manual examples against automation in scratch before applying a mechanical sweep, including coupled declarations and callers.
 
 ### Fixed

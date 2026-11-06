@@ -83,6 +83,7 @@ Not feature work, just upkeep.
 Two model-invoked references that run *beneath* the other skills, each the single source of truth for its vocabulary. Reach for them directly when the **words**, not the process, are the problem; or let the skills above pull them in.
 
 - **`/domain-modeling`**: sharpen the project's *domain* language: challenge a fuzzy term, resolve an overloaded word ("account" doing three jobs), record a hard-to-reverse decision as an ADR. It's the active discipline `/grill-with-docs` drives to keep `GLOSSARY.md` a clean glossary.
+- **`/project-lore`**: the facts the code cannot show. Before a plan or a bug fix, read `docs/lore/` for the files you will touch. When you learn a pitfall or a why, record it there. Before a commit, check the diff against entries whose `code:` path matches. Words stay in `GLOSSARY.md`.
 - **`/codebase-design`** is the deep-module vocabulary (module, interface, depth, seam, adapter, leverage, locality) for designing a module's *shape*: a lot of behaviour behind a small interface at a clean seam. `/tdd` and `/improve-architecture` both speak it. Its state-contract guidance covers valid states, input validation, shared writes, and recovery for implementation flows.
 
 ## Phase boundaries

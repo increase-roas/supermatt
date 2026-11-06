@@ -1,0 +1,5 @@
+interface:
+  display_name: "SuperMatt: Project Lore"
+  short_description: "Read, record, and check project pitfalls the code cannot show"
+policy:
+  allow_implicit_invocation: true
