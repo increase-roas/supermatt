@@ -67,4 +67,4 @@ Is the work checked by something other than its author? Look for a pre-commit ho
 <recommended fix and the `/implement` command for this host>
 ```
 
-The verdict is **healthy** when every area scores 2 or above, **localized** when one or two areas fall below 2, and **systemic** when three or more do.
+The verdict is **healthy** when every area scores 3. **Localized** when one or two areas fall below 3. **Systemic** when three or more do. A 2 is not healthy.
