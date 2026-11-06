@@ -15,7 +15,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 
 - A skill that continues into another skill loads that skill. It does not tell the user to type the next command. The chain is the one named in `ask-supermatt`: grill, spec, tickets, implement, qa, review, ship. A missing tracker doc loads `setup-supermatt-skills` and then the original skill continues.
-- `doctor` is the one command for a folder of leftover chats and copies. It moves folders with no git into `archive/` and leaves checkouts and worktrees in place. A file delete never runs. 1Password stays the read-only route on its card.
+- `doctor` is the one command. It saves work that was sitting in a checkout, pushes it, and removes an extra checkout once the remote has that commit. A machine name or a date becomes a short plain name. A folder with no git moves into `archive/`. A key or a `.env` stays unprinted and uncommitted.
 - Workflow skills are model-invoked. `disable-model-invocation` is off and `allow_implicit_invocation` is true, so Claude, Codex, and Cursor can open them from the message.
 - `domain-modeling`: a glossary term can point at the type that implements it, list accepted synonyms on `_Aka_`, and carry one example when two nearby concepts get confused. A renamed term stays, marked obsolete, and points at the new term. Adapted from mukiwu/muki-ai-plugins lore glossary (MIT). The term list stays in `GLOSSARY.md`.
 - `what-would-you-do`: model-invoked, so an agent about to ask a non-gate question answers it this way and acts on the recommendation.

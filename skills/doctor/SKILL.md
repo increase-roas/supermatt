@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: "Use when Alex says doctor, fix all the repos, organize the Codex folder, or fix 1Password. One command. It assumes he was building a harness, moves the leftover folders out of the way, and asks only when two live checkouts disagree."
+description: "Use when the AI left a mess: dated folders, random names, extra checkouts, or unsaved work. doctor cleans it up and gives the folders plain names."
 license: MIT
 ---
 
@@ -21,10 +21,11 @@ That runs `python3 ~/Projects/supermatt/skills/doctor/doctor.py`. A path argumen
 The class comes from `classify.py` in this folder. `.git` as a directory is a checkout. `.git` as a file is a worktree. A date in the name decides nothing.
 
 - A child with no git moves into `archive/` in the same folder. The bytes stay. `archive/MANIFEST.tsv` records the old path and the new path. A symlink stays where it is.
-- A checkout, a worktree, and a nest stay. Removing them would delete files, and a file delete never runs.
+- A checkout with work sitting in it is saved and pushed. The person running this command is not asked what that work is.
+- An extra checkout git keeps beside the main one is saved, pushed, and then removed once the remote has that same commit. The checked cleanup in `safe-cleanup` does the removal. A folder with no remote stays, because removing it would throw the work away.
+- A file that holds a key or a `.env` is left uncommitted and unprinted, and that folder stays.
+- A machine name, a date, or a random two-word name is replaced with a short plain name from the folder's own title. The old name is written in `archive/MANIFEST.tsv`.
 - `archive` itself stays. Run `doctor` again and it does not move the archive.
-- A checkout is fetched. When it is clean and behind its remote, it is fast-forwarded.
-- When `AGENTS.md` and `CLAUDE.md` in a checkout both carry rules, load and follow `improve-agent-setup` and do the fixes it ranks. Do not lay the client-project skeleton onto a tool repo or onto the harness.
 
 ## 1Password
 
