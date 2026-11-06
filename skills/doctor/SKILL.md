@@ -1,36 +1,21 @@
 ---
 name: doctor
-description: "Use when the AI left a mess: dated folders, random names, extra checkouts, or unsaved work. doctor cleans it up and gives the folders plain names."
+description: "Use when asked to clean up folders an agent left behind, save unfinished work safely, or check and repair Codex setup."
 license: MIT
 ---
 
 # Doctor
 
-The command is `doctor`. It assumes the person was building a harness and that the folder in front of it is leftover chats, copies, and one-off repairs. It does not ask which folder, which file, or whether to continue. It asks only when two live checkouts have the same remote and different unpushed commits, because it cannot tell which one was the real direction.
+When someone asks to clean up after an agent, choose the path, run the check, and make the eligible repairs in the same turn. Use `doctor.py` beside this skill. For example, `python3 -B /path/to/doctor/doctor.py --dry-run "/path/to/folder"`. The person can ask in ordinary language or invoke this skill through their host.
 
-The default folder is `~/Documents/Codex`. `~/.codex` is the app config. This command does not open it.
+## Folders and unfinished work
 
-```sh
-doctor
-```
+1. Use the requested folder, or `~/Documents/Codex` for a general cleanup. Start with `--dry-run`. Carry any excluded paths into each targeted run with `--exclude PATH`. Use absolute exclusions when switching targets. Javar paths, including Javar Testing, stay out of scope. Inspect only the requested area.
+2. For a collection, inventory the likely leftovers and check which paths are still in use. Check open sessions or workspaces through the host's available read-only route, plus any project pointers that name the path. Treat a date or generated name as a clue. For a closed loose folder with no live references, preview its individual path with `--archive --dry-run`, then run it with `--archive`. Doctor keeps the entire folder under a plain name in the sibling `archive` and records where it went. If a run stops after recording a move and leaves the source in place, retry that same path. Keep active, referenced, linked, or uncertain paths in place and say why.
+3. For each in-scope checkout with unfinished work, run its explicit path. Doctor saves eligible unstaged text on a separate snapshot branch and lists held nonignored paths with reasons. It counts ignored paths separately. When a checkout needs its own commit checks, keep the files in place and explain that its normal workflow applies. Git history, the original index, and checkout paths stay in place. Doctor publishes the snapshot only when it can verify the starting commit on the matching remote branch and then read back the snapshot commit. A local snapshot is a local save. Doctor also checks the current commit's remote status when there is no new snapshot to make. Keep linked checkouts in place, even when a snapshot reaches the remote.
+4. Report what moved, what saved locally or reached the remote, and what still needs attention. Use the archive's completed rows and the remote commit readback as proof. Keep unmatched plans, skipped paths, and tool errors visible.
 
-That runs `python3 ~/Projects/supermatt/skills/doctor/doctor.py`. A path argument replaces the default folder.
+## Codex and connected tools
 
-## What it does
-
-The class comes from `classify.py` in this folder. `.git` as a directory is a checkout. `.git` as a file is a worktree. A date in the name decides nothing.
-
-- A child with no git moves into `archive/` in the same folder. The bytes stay. `archive/MANIFEST.tsv` records the old path and the new path. A symlink stays where it is.
-- A checkout with work sitting in it is saved and pushed. The person running this command is not asked what that work is.
-- An extra checkout git keeps beside the main one is saved, pushed, and then removed once the remote has that same commit. The checked cleanup in `safe-cleanup` does the removal. A folder with no remote stays, because removing it would throw the work away.
-- A file that holds a key or a `.env` is left uncommitted and unprinted, and that folder stays.
-- A machine name, a date, or a random two-word name is replaced with a short plain name from the folder's own title. The old name is written in `archive/MANIFEST.tsv`.
-- `archive` itself stays. Run `doctor` again and it does not move the archive.
-
-## 1Password
-
-1Password stays the read-only Connectors route on the `1password` card, account `_1password_forby-paon`. After the folder pass, list the vaults. Do not print a secret, do not read a local env file, and do not write a vault item. That account cannot write. If the list fails, retry it once. If it fails again, say the route is down.
-
-## Done
-
-Done when the folder shows only checkouts, nests, files, and `archive`, the manifest has one row per folder that moved, and the vault list either returned or the retry failed.
+1. For a Codex setup request, target `~/.codex` or the active `CODEX_HOME`. This runs Codex's native diagnostic and summarizes known health checks. The diagnostic can initialize temporary runtime helpers. Use the reported issue to choose the owning setup procedure. When a supported settings repair is in scope, load and follow the host's Codex settings procedure, then verify the changed setting where Codex uses it. Keep platform safety and unrelated settings intact. If the native diagnostic is missing or times out, report the exact gap and use the host's supported read-only check for the affected setting.
+2. If the request includes 1Password health, read the local `1password` tool card and list vaults on its dedicated read-only account. Report whether the route returned. Retry a transient error once on the same route. Keep credentials and item contents out of the output, and leave vaults untouched. Report when the host lacks the registered route. The folder command itself does not call 1Password.

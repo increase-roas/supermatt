@@ -1,5 +1,5 @@
 interface:
   display_name: "SuperMatt: Doctor"
-  short_description: "One command that clears leftover folders"
+  short_description: "Save unfinished work and check Codex setup"
 policy:
   allow_implicit_invocation: true

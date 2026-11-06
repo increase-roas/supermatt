@@ -1,180 +1,357 @@
 #!/usr/bin/env python3
-"""Move leftover folders aside. Checkouts stay. Nothing is deleted."""
+"""Preserve work in a scoped folder and report what was saved."""
+import argparse
+import fcntl
 import json
+import os
 import re
+import stat
 import subprocess
 import sys
 import tempfile
+from contextlib import ExitStack
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 from classify import classify
 
 DEFAULT = Path.home() / "Documents" / "Codex"
 ARCHIVE = "archive"
-CLEANUP = Path.home() / ".agents/skills/safe-cleanup/scripts/checked_cleanup.py"
+MAX_FILE_BYTES = 2_000_000
+MAX_SNAPSHOT_BYTES = 25_000_000
+PROTECTED_NAME = re.compile(r"(?:^|[^a-z0-9])javar(?:testing)?(?:$|[^a-z0-9])", re.I)
+SECRET_PATH = re.compile(
+    r"(?:^|[._-])(?:env|secrets?|credentials?|id_rsa|id_ed25519)(?:$|[._-])|"
+    r"(?:^|\.)(?:envrc|netrc|npmrc|pypirc)$|"
+    r"\.(?:pem|key|p12|pfx|age|b64|private|gz|zip|sqlite3?|db)$", re.I)
 SECRET = re.compile(
-    r"-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}|"
-    r"ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|"
-    r"xox[baprs]-"
-)
-VERIFY = """import subprocess, sys
-head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True).strip()
-remote = subprocess.check_output(["git", "ls-remote", "origin", "refs/heads/" + branch], text=True).split()
-sys.exit(0 if remote and remote[0] == head else 1)
-"""
+    r"-----BEGIN [^-\n]*PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|"
+    r"github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|"
+    r"AIza[A-Za-z0-9_-]{35}|(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{16,}|"
+    r"npm_[A-Za-z0-9]{20,}|glpat-[A-Za-z0-9_-]{20,}|"
+    r"eyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{8,}|"
+    r"xox[baprs]-|(?:AKIA|ASIA)[A-Z0-9]{16}|authorization\s*:\s*(?:bearer|basic)\s+\S+|"
+    r"https?://[^\s/:]+:[^\s/@]+@|"
+    r"""\b(?:api[_ -]?key|access[_ -]?token|auth[_ -]?token|client[_ -]?secret|"""
+    r"""(?:aws[_ -]?)?secret[_ -]?access[_ -]?key|password|secret|token)['"]?\s*[:=]\s*['"]?\S""",
+    re.I)
+GIT_LOCATION = {
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GIT_INDEX_FILE", "GIT_PREFIX",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_QUARANTINE_PATH",
+}
 
 
-def git(path, *args):
-    return subprocess.run(["git", "-C", str(path), *args], capture_output=True, text=True)
+def git(path, *args, data=None, index=None):
+    env = {name: value for name, value in os.environ.items() if name not in GIT_LOCATION}
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    env["GIT_NO_REPLACE_OBJECTS"] = "1"
+    if index is not None:
+        env["GIT_INDEX_FILE"] = str(index)
+    return subprocess.run(
+        ["git", "--no-optional-locks", "-C", str(path), *args],
+        input=data, capture_output=True, env=env, timeout=30)
 
 
-def hide_junk(path):
-    located = git(path, "rev-parse", "--git-path", "info/exclude")
-    if located.returncode != 0:
-        return
-    exclude = Path(located.stdout.strip())
-    if not exclude.is_absolute():
-        exclude = (path / exclude).resolve()
-    exclude.parent.mkdir(parents=True, exist_ok=True)
-    current = exclude.read_text() if exclude.exists() else ""
-    if ".DS_Store" not in current.splitlines():
-        with exclude.open("a") as handle:
-            handle.write(".DS_Store\n")
+def value(path, *args, **kwargs):
+    result = git(path, *args, **kwargs)
+    return os.fsdecode(result.stdout).removesuffix("\n") if result.returncode == 0 else None
 
 
-def skip_work_file(file_path: Path) -> bool:
-    name = file_path.name
-    if name == ".DS_Store" or name.endswith((".age", ".b64", ".private", ".tar.gz")):
-        return True
-    try:
-        return file_path.is_file() and file_path.stat().st_size > 50_000_000
-    except OSError:
-        return True
+def protected(path, exclusions):
+    parts = tuple(part.casefold() for part in path.parts)
+    return any(PROTECTED_NAME.search(part) for part in path.parts) or any(
+        parts[:len(excluded.parts)] == tuple(part.casefold() for part in excluded.parts)
+        for excluded in exclusions)
 
 
-def holds_secret(file_path: Path) -> bool:
-    name = file_path.name
-    if name == ".env" or name.endswith(".env") or file_path.suffix == ".pem":
-        return True
-    if not file_path.is_file() or file_path.stat().st_size > 2_000_000:
-        return False
-    try:
-        text = file_path.read_text(errors="ignore")
-    except OSError:
-        return False
-    return SECRET.search(text) is not None
+def checkout_root(path):
+    top = value(path, "rev-parse", "--show-toplevel")
+    return Path(top).resolve() if top else None
 
 
-def dirty_files(path):
-    listed = git(path, "status", "--porcelain", "-uall")
-    names = []
-    for line in listed.stdout.splitlines():
-        name = line[3:]
-        if " -> " in name:
-            name = name.split(" -> ", 1)[1]
-        names.append(name.strip().strip('"'))
-    return names
-
-
-def save_changes(path: Path) -> str:
-    hide_junk(path)
-    secrets = []
-    normal = []
-    for rel in dirty_files(path):
-        if Path(rel).name == ".DS_Store" or skip_work_file(path / rel):
-            continue
-        file_path = path / rel
-        if file_path.is_file() and holds_secret(file_path):
-            secrets.append(rel)
-        else:
-            normal.append(rel)
-    if not normal:
-        return "secret" if secrets else "clean"
-    for rel in normal:
-        git(path, "add", "--", rel)
-    committed = git(path, "commit", "-m", "Save the working tree.")
-    if committed.returncode != 0:
-        return "commit-failed"
-    return "secret" if secrets else "committed"
-
-
-def publish(path: Path) -> str:
-    if git(path, "remote", "get-url", "origin").returncode != 0:
-        return "no-remote"
-    branch = git(path, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
-    if branch == "HEAD":
-        return "detached"
-    git(path, "fetch", "origin", branch)
-    counts = git(path, "rev-list", "--left-right", "--count", f"HEAD...origin/{branch}")
-    if counts.returncode == 0:
-        ahead, behind = counts.stdout.split()
-        if behind != "0":
-            rebasing = git(path, "pull", "--rebase", "origin", branch)
-            if rebasing.returncode != 0:
-                git(path, "rebase", "--abort")
-                return "disagree"
-    git(path, "push", "-u", "origin", "HEAD")
-    head = git(path, "rev-parse", "HEAD").stdout.strip()
-    remote = git(path, "ls-remote", "origin", f"refs/heads/{branch}").stdout.split()
-    if remote and remote[0] == head:
-        return "pushed"
-    return "push-failed"
-
-
-def main_repo(path: Path):
-    located = git(path, "rev-parse", "--git-common-dir")
-    if located.returncode != 0:
+def status(path):
+    result = git(path, "-c", "status.renames=false", "status", "--porcelain=v1", "-z",
+                 "--untracked-files=all", "--ignored=matching", "--ignore-submodules=none")
+    if result.returncode != 0:
         return None
-    common = Path(located.stdout.strip())
-    if not common.is_absolute():
-        common = (path / common).resolve()
-    return common.parent
+    return [(entry[:2], entry[3:]) for entry in result.stdout.split(b"\0") if entry]
 
 
-def retire(path: Path) -> str:
-    target = str(path.resolve())
-    repo = main_repo(path)
-    if repo is None:
-        return "kept"
-    repo = repo.resolve()
-    evidence = Path(tempfile.mkdtemp(prefix="doctor-")).resolve()
-    manifest = evidence / "inventory.json"
-    verify = evidence / "verify.py"
-    verify.write_text(VERIFY)
-    snap = subprocess.run(
-        [sys.executable, "-B", str(CLEANUP), "snapshot",
-         "--repo", str(repo), "--target", target, "--manifest", str(manifest)],
-        capture_output=True, text=True)
-    if snap.returncode != 0:
-        return "kept"
-    removed = subprocess.run(
-        [sys.executable, "-B", str(CLEANUP), "remove",
-         "--repo", str(repo), "--target", target, "--manifest", str(manifest),
-         "--check-json", json.dumps([sys.executable, "-B", str(verify)])],
-        capture_output=True, text=True)
-    return "removed" if removed.returncode == 0 else "kept"
+def eligible_file(path, relative):
+    rel = Path(os.fsdecode(relative))
+    if not rel.parts or rel.is_absolute() or ".." in rel.parts:
+        return None, "could not verify the file path"
+    if rel.name.casefold() == ".ds_store":
+        return None, "system metadata"
+    if any(SECRET_PATH.search(part) for part in rel.parts):
+        return None, "credential or archive filename"
+    try:
+        with ExitStack() as stack:
+            directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+            parent = os.open(path, directory_flags)
+            stack.callback(os.close, parent)
+            for part in rel.parts[:-1]:
+                parent = os.open(part, directory_flags, dir_fd=parent)
+                stack.callback(os.close, parent)
+            flags = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+            handle = stack.enter_context(os.fdopen(os.open(rel.name, flags, dir_fd=parent), "rb"))
+            before = os.fstat(handle.fileno())
+            if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1:
+                return None, "linked or special file"
+            if before.st_size > MAX_FILE_BYTES:
+                return None, "larger than the snapshot file limit"
+            content = handle.read(MAX_FILE_BYTES + 1)
+            after = os.fstat(handle.fileno())
+        if len(content) != before.st_size or before.st_mtime_ns != after.st_mtime_ns:
+            return None, "changed while being read"
+        decoded = content.decode("utf-8")
+    except (OSError, RuntimeError):
+        return None, "linked or unreadable file"
+    except UnicodeDecodeError:
+        return None, "nontext file"
+    if any(ord(char) < 32 and char not in "\r\n\t" for char in decoded):
+        return None, "nontext file"
+    if SECRET.search(decoded):
+        return None, "possible credential in the file"
+    mode = "100755" if before.st_mode & stat.S_IXUSR else "100644"
+    return (mode, content), None
 
 
-def settle(path: Path) -> str:
-    saved = save_changes(path)
-    if saved == "secret":
-        return "left"
-    published = publish(path)
-    if classify(path) == "worktree" and published == "pushed" and not dirty_files(path):
-        return retire(path)
-    return published
+def snapshot_tree(path, head, files):
+    with tempfile.TemporaryDirectory(prefix="supermatt-doctor-") as temporary:
+        index = Path(temporary) / "index"
+        if git(path, "read-tree", head, index=index).returncode != 0:
+            return None
+        entries = []
+        for relative, mode, content in files:
+            oid = value(path, "hash-object", "-w", "--stdin", data=content)
+            if oid is None:
+                return None
+            entries.append(f"{mode} {oid}\t".encode() + relative + b"\0")
+        if git(path, "update-index", "-z", "--index-info", index=index,
+               data=b"".join(entries)).returncode != 0:
+            return None
+        return value(path, "write-tree", index=index)
 
 
-def checkouts(parent: Path):
-    for child in sorted(parent.iterdir(), key=lambda item: item.name.lower()):
-        if child.name == ARCHIVE or child.is_symlink():
+def has_commit_hooks(path):
+    location = value(path, "config", "--path", "--get", "core.hooksPath")
+    if location is None:
+        location = value(path, "rev-parse", "--git-path", "hooks")
+    if location is None:
+        return True
+    hooks = path / location
+    return any(os.access(hooks / hook, os.X_OK) for hook in
+               ("pre-commit", "prepare-commit-msg", "commit-msg"))
+
+
+def save_snapshot(path, head, tree):
+    branch = f"doctor/save-{head[:12]}-{tree[:12]}"
+    ref = f"refs/heads/{branch}"
+    existing = value(path, "rev-parse", "--verify", ref)
+    if existing is None:
+        commit = value(path, "commit-tree", tree, "-p", head, "-m", "Save work with SuperMatt Doctor")
+        if commit and git(path, "update-ref", ref, commit, "0" * len(head)).returncode == 0:
+            return branch, commit
+        existing = value(path, "rev-parse", "--verify", ref)
+    if existing and value(path, "show", "-s", "--format=%T %P", existing) == f"{tree} {head}":
+        return branch, existing
+    return None
+
+
+def remote_ref(path, ref):
+    result = git(path, "ls-remote", "--exit-code", "origin", ref)
+    if result.returncode == 2:
+        return ""
+    fields = result.stdout.split()
+    if result.returncode == 0 and len(fields) == 2 and fields[1] == ref.encode():
+        return fields[0].decode("ascii")
+    return None
+
+
+def remote_problem(path, exclusions):
+    fetch_urls = value(path, "remote", "get-url", "--all", "origin")
+    push_urls = value(path, "remote", "get-url", "--push", "--all", "origin")
+    if not fetch_urls or fetch_urls != push_urls or "\n" in fetch_urls:
+        return "the push and readback need one matching remote"
+    if PROTECTED_NAME.search(unquote(fetch_urls)):
+        return "the remote destination is excluded"
+    try:
+        parsed = urlsplit(fetch_urls) if "://" in fetch_urls else None
+    except ValueError:
+        return "the remote route could not be verified"
+    if parsed and parsed.scheme == "file":
+        file_url = parsed
+        if file_url.netloc.casefold() not in ("", "localhost") or not file_url.path.startswith("/"):
+            return "the local remote path could not be verified"
+        local = Path(unquote(file_url.path))
+    elif parsed:
+        if parsed.scheme not in ("https", "http", "ssh", "git"):
+            return "the remote route could not be verified"
+        return None
+    elif fetch_urls.startswith("file:"):
+        return "the local remote path could not be verified"
+    elif re.fullmatch(r"(?:[^/@:]+@)?(?:\[[^\]]+\]|[^/:]+):(?!:).+", fetch_urls):
+        return None
+    elif "::" in fetch_urls:
+        return "the remote route could not be verified"
+    else:
+        local = path / fetch_urls
+    try:
+        resolved = local.resolve()
+    except (OSError, RuntimeError, ValueError):
+        return "the local remote path could not be verified"
+    if protected(local, exclusions) or protected(resolved, exclusions):
+        return "the remote destination is excluded"
+    common_dir = value(resolved, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    if not common_dir:
+        return "the local remote's Git data could not be verified"
+    if protected(Path(common_dir).resolve(), exclusions):
+        return "the remote destination is excluded"
+    return None
+
+
+def report_durability(path, head, exclusions):
+    source_ref = value(path, "symbolic-ref", "-q", "HEAD")
+    try:
+        problem = remote_problem(path, exclusions)
+        if problem or not source_ref:
+            print(f"Remote backup is unverified because {problem or 'this checkout has no current branch'}.")
+            return
+        current = remote_ref(path, source_ref)
+        if current == head:
+            print("The remote branch confirms the checkout's current commit.")
+        elif current and git(path, "merge-base", "--is-ancestor", current, head).returncode == 0:
+            print("The current commit is ahead of its remote branch. This commit is only verified locally.")
+        elif current == "":
+            print("The remote has no matching branch. The current commit is only verified locally.")
+        else:
+            print("The remote did not confirm the current commit. Remote backup is unverified.")
+    except subprocess.TimeoutExpired:
+        print("Remote backup is unverified because the check timed out.")
+
+
+def publish_snapshot(path, head, branch, commit, exclusions):
+    problem = remote_problem(path, exclusions)
+    if problem:
+        return problem
+    source_ref = value(path, "symbolic-ref", "-q", "HEAD")
+    if not source_ref or remote_ref(path, source_ref) != head:
+        return "the checked-out commit differs from the remote or could not be verified"
+    destination = f"refs/heads/{branch}"
+    remote = remote_ref(path, destination)
+    if remote == commit:
+        return None
+    if remote != "":
+        return "the snapshot branch is already in use or could not be checked"
+    git(path, "push", "--no-follow-tags", "--recurse-submodules=no",
+        "origin", f"{commit}:{destination}")
+    if remote_ref(path, destination) != commit:
+        return "the remote did not confirm the saved commit"
+    return None
+
+
+def settle(path, dry_run, exclusions):
+    marker = path / ".git"
+    if marker.is_symlink():
+        print("Kept in place. The checkout's Git data is linked elsewhere.")
+        return 1
+    if marker.is_file():
+        with marker.open("rb") as handle:
+            pointer = os.fsdecode(handle.readline(4096)).strip()
+        if not pointer.startswith("gitdir: ") or protected(
+                (path / pointer.removeprefix("gitdir: ")).resolve(), exclusions):
+            print("Skipped. The checkout's Git data is excluded or unavailable.")
+            return 1
+    git_dir = value(path, "rev-parse", "--absolute-git-dir")
+    common_dir = value(path, "rev-parse", "--path-format=absolute", "--git-common-dir")
+    if not git_dir or not common_dir or any(
+            protected(Path(location).resolve(), exclusions) for location in (git_dir, common_dir)):
+        print("Skipped. The checkout's Git data is excluded or unavailable.")
+        return 1
+    if checkout_root(path) != path:
+        print("Kept in place. Git could not confirm this checkout.")
+        return 1
+    head = value(path, "rev-parse", "--verify", "HEAD")
+    entries = status(path)
+    if entries is None:
+        print("Kept in place. Git could not check the saved and unsaved files.")
+        return 1
+    files = []
+    size = 0
+    candidates = [relative for state, relative in entries if state in (b" M", b"??")
+                  and not protected(path / os.fsdecode(relative), exclusions)]
+    ignored = {relative for state, relative in entries if state == b"!!"}
+    if candidates:
+        ignore_check = git(path, "check-ignore", "--no-index", "-z", "--stdin",
+                           data=b"\0".join(candidates) + b"\0")
+        if ignore_check.returncode not in (0, 1):
+            print("Kept on disk. Git could not verify which files to leave out.")
+            return 1
+        ignored.update(item for item in ignore_check.stdout.split(b"\0") if item)
+    for state, relative in entries:
+        if relative in ignored:
             continue
-        kind = classify(child)
-        if kind in ("primary", "worktree", "misplaced"):
-            yield child
-        elif kind == "nest":
-            yield from checkouts(child)
+        name = os.fsdecode(relative)
+        if protected(path / name, exclusions):
+            reason = "excluded path"
+        elif state == b" D":
+            reason = "working copy records a deletion"
+        elif state not in (b" M", b"??"):
+            reason = "staged, conflicting, or changed file type"
+        else:
+            found, reason = eligible_file(path, relative)
+            if found:
+                mode, content = found
+                if size + len(content) <= MAX_SNAPSHOT_BYTES:
+                    files.append((relative, mode, content))
+                    size += len(content)
+                    continue
+                reason = "snapshot size limit"
+        display = "[credential-like filename]" if SECRET.search(name) else repr(name)
+        print(f"Kept {display} on disk ({reason}).")
+    if ignored:
+        print(f"Git reports {len(ignored)} ignored path(s), including any grouped folders. They stay on disk.")
+    if head is None:
+        print("Kept on disk. This checkout has no starting commit yet.")
+        return 0
+    if not files:
+        print("No eligible unsaved files needed a snapshot. The checkout stays in place.")
+        if not dry_run:
+            report_durability(path, head, exclusions)
+        return 0
+    if has_commit_hooks(path):
+        print("Kept on disk. This checkout needs its normal commit workflow to run its checks.")
+        return 0
+    if dry_run:
+        print(f"Preview. {len(files)} file(s) qualify for a separate snapshot.")
+        return 0
+    if head != value(path, "rev-parse", "--verify", "HEAD") or entries != status(path):
+        print("Kept on disk. The checkout changed during the check.")
+        return 1
+    base = value(path, "rev-parse", f"{head}^{{tree}}") if head else None
+    if base is None:
+        print("Kept on disk. Git could not verify the starting commit.")
+        return 1
+    tree = snapshot_tree(path, head, files)
+    if tree == base:
+        print("The eligible files already match the starting commit.")
+        return 0
+    saved = save_snapshot(path, head, tree) if tree else None
+    if saved is None:
+        print("Kept on disk. Git could not create a separate snapshot.")
+        return 1
+    branch, commit = saved
+    try:
+        reason = publish_snapshot(path, head, branch, commit, exclusions)
+    except subprocess.TimeoutExpired:
+        reason = "the remote check timed out"
+    if reason:
+        print(f"Saved {len(files)} file(s) locally on {branch}. Kept local because {reason}.")
+    else:
+        print(f"Saved {len(files)} file(s) on {branch} and verified remote commit {commit}.")
+    print("The checkout and its original branch stay in place.")
+    return 0
 
 
 JUNK_WORDS = {"repair", "fix", "proposal", "worktrees", "patch", "wip", "tmp", "the", "and", "for", "archive"}
@@ -182,201 +359,239 @@ DATE_WORDS = re.compile(r"20\d{2}[-_ ]?[01]\d[-_ ]?[0-3]\d(?:t[0-9]{6}z)?", re.I
 RANDOM_NAME = re.compile(r"^[a-z]+-[a-z]+-[a-z]*\d[a-z0-9]*$")
 
 
-def show_word(word):
-    if any(char.isupper() for char in word[1:]):
-        return word
-    return word.capitalize()
-
-
 def plain_name(name, title=""):
-    if not title and RANDOM_NAME.fullmatch(name or ""):
+    if not title and RANDOM_NAME.fullmatch(name):
         return ""
-    source = title or name.replace("-", " ").replace("_", " ")
-    source = DATE_WORDS.sub(" ", source)
-    source = re.sub(r"[^A-Za-z0-9]+", " ", source)
-    words = []
-    for word in source.split():
-        if word.lower() in JUNK_WORDS or word.isdigit() or len(word) <= 1:
-            continue
-        words.append(show_word(word))
-        if len(words) == 3:
-            break
-    return " ".join(words)
+    words = re.findall(r"[A-Za-z0-9]+", DATE_WORDS.sub(" ", title or name))
+    words = [word for word in words if word.lower() not in JUNK_WORDS
+             and not word.isdigit() and len(word) > 1]
+    return " ".join(word if any(char.isupper() for char in word[1:]) else word.capitalize()
+                    for word in words[:3])
 
 
-def folder_title(path: Path) -> str:
-    chosen = []
-    for cand in ("README.md", "STATUS.md", "RESULT.md", "REPORT.md"):
-        file_path = path / cand
-        if file_path.is_file():
-            chosen.append(file_path)
-    if not chosen:
-        chosen = sorted(path.glob("*.md"))[:1]
-    for file_path in chosen:
-        try:
-            lines = file_path.read_text(errors="ignore").splitlines()
-        except OSError:
+def folder_title(path):
+    for name in ("README.md", "STATUS.md", "RESULT.md", "REPORT.md"):
+        candidate = path / name
+        if not candidate.is_file():
             continue
-        for line in lines:
-            line = line.strip().lstrip("#").strip()
-            if not line or "Status:" in line or "/" in line or len(line) > 60:
-                continue
-            return line
+        with candidate.open("rb") as handle:
+            content = handle.read(4096).decode("utf-8", errors="replace")
+        for line in content.splitlines():
+            title = line.removeprefix("# ").strip()
+            if line.startswith("# ") and len(title) <= 60 and not SECRET.search(title):
+                return title
     return ""
 
 
-def friendly_name(path: Path) -> str:
-    named = plain_name(path.name, folder_title(path))
-    if named:
-        return named
-    if classify(path) not in ("primary", "worktree", "misplaced"):
-        return ""
-    branch = git(path, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
-    branch = re.sub(r"^(feat|fix|chore|repair)/", "", branch)
-    if branch and branch != "HEAD":
-        return plain_name(branch, "")
-    return ""
+def walk_error(error):
+    raise error
 
 
-def rename_folder(path: Path):
-    new = friendly_name(path)
-    if not new or new == path.name:
-        return path
-    dest = path.parent / new
-    if dest.exists():
-        return path
-    if classify(path) == "worktree":
-        repo = main_repo(path)
-        if repo is None:
-            return path
-        moved = git(repo, "worktree", "move", str(path), str(dest))
-        return dest if moved.returncode == 0 else path
-    path.rename(dest)
-    return dest
+def bare_repository(path):
+    return ((path / "HEAD").is_file() and (path / "objects").is_dir()
+            and any((path / name).exists() for name in ("refs", "reftable", "packed-refs")))
 
 
-def rename_children(parent: Path):
-    renamed = []
-    archive = parent / ARCHIVE
-    targets = [child for child in parent.iterdir()
-               if child.is_dir() and child.name != ARCHIVE and not child.is_symlink()]
-    if archive.is_dir():
-        targets.extend(child for child in archive.iterdir() if child.is_dir())
-    for child in targets:
-        before = child.name
-        after = rename_folder(child)
-        if after.name != before:
-            renamed.append((before, after.name))
-    if renamed and archive.is_dir():
-        with (archive / "MANIFEST.tsv").open("a") as handle:
-            for before, after in renamed:
-                handle.write(f"renamed\t{before}\t{after}\n")
-    return renamed
+def open_archive_record(path, write):
+    flags = os.O_NOFOLLOW | os.O_NONBLOCK
+    flags |= os.O_RDWR | os.O_APPEND | os.O_CREAT if write else os.O_RDONLY
+    record = os.fdopen(os.open(path, flags, 0o600), "a+" if write else "r",
+                       encoding="utf-8", errors="replace")
+    try:
+        info = os.fstat(record.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise OSError("archive record must be one regular file")
+        fcntl.flock(record.fileno(), fcntl.LOCK_EX if write else fcntl.LOCK_SH)
+        if os.fstat(record.fileno()).st_nlink != 1:
+            raise OSError("archive record gained a link")
+    except OSError:
+        record.close()
+        raise
+    return record
 
 
-def plan(parent: Path):
-    moves = []
-    keeps = []
-    for child in sorted(parent.iterdir(), key=lambda p: p.name.lower()):
-        if child.name == ARCHIVE or child.is_symlink():
-            keeps.append((child.name, "keep"))
-            continue
-        kind = classify(child)
-        if kind == "dump":
-            moves.append(child)
-        else:
-            keeps.append((child.name, kind))
-    return moves, keeps
+def pending_move(record, paths):
+    record.seek(0)
+    pending = False
+    for row in record:
+        action, _, written_paths = row.rstrip("\n").partition("\t")
+        if written_paths == paths and action in ("planned", "moved"):
+            pending = action == "planned"
+    return pending
 
 
-def same_remote_disagreement(parent: Path):
-    """Two checkouts, one remote, different unpushed commits."""
-    by_remote = {}
-    for child in parent.iterdir():
-        if classify(child) != "primary":
-            continue
-        url = subprocess.run(
-            ["git", "-C", str(child), "remote", "get-url", "origin"],
-            capture_output=True, text=True)
-        if url.returncode != 0:
-            continue
-        head = subprocess.run(
-            ["git", "-C", str(child), "rev-parse", "HEAD"],
-            capture_output=True, text=True)
-        by_remote.setdefault(url.stdout.strip(), []).append(
-            (child.name, head.stdout.strip()))
-    unsure = []
-    for url, rows in by_remote.items():
-        heads = {h for _, h in rows}
-        if len(rows) > 1 and len(heads) > 1:
-            unsure.append((url, [name for name, _ in rows]))
-    return unsure
-
-
-def fast_forward(path: Path) -> str:
-    inside = subprocess.run(
-        ["git", "-C", str(path), "rev-parse", "--is-inside-work-tree"],
-        capture_output=True, text=True)
-    if inside.returncode != 0 or inside.stdout.strip() != "true":
-        return "skip"
-    subprocess.run(["git", "-C", str(path), "fetch", "--quiet"], capture_output=True)
-    dirty = subprocess.run(
-        ["git", "-C", str(path), "status", "--porcelain"],
-        capture_output=True, text=True)
-    if dirty.stdout.strip():
-        return "dirty"
-    counts = subprocess.run(
-        ["git", "-C", str(path), "rev-list", "--left-right", "--count", "HEAD...@{u}"],
-        capture_output=True, text=True)
-    if counts.returncode != 0:
-        return "no-upstream"
-    ahead, behind = counts.stdout.split()
-    if ahead == "0" and behind != "0":
-        merged = subprocess.run(
-            ["git", "-C", str(path), "merge", "--ff-only", "@{u}"],
-            capture_output=True, text=True)
-        return "forwarded" if merged.returncode == 0 else "behind"
-    return "current"
-
-
-def apply(parent: Path):
-    parent = Path(parent)
-    moves, keeps = plan(parent)
-    archive = parent / ARCHIVE
-    if moves:
-        archive.mkdir(exist_ok=True)
+def archive_folder(path, dry_run, exclusions):
+    if (Path.cwd().is_relative_to(path) or Path.home().is_relative_to(path)
+            or ARCHIVE in (part.casefold() for part in path.parts)
+            or any(part.startswith(".") for part in path.parts)
+            or checkout_root(path) is not None or classify(path) != "dump"):
+        print("Kept in place. This is an active path, system folder, archive, or checkout.")
+        return 1
+    for directory, folders, files in os.walk(path, onerror=walk_error):
+        if "HEAD" in files and "objects" in folders and bare_repository(Path(directory)):
+            print("Kept in place. This folder is or contains a bare Git repository.")
+            return 1
+        for name in folders + files:
+            entry = Path(directory) / name
+            if name == ".git" or entry.is_symlink() or protected(entry, exclusions):
+                print("Kept in place. The folder contains a checkout, link, or excluded path.")
+                return 1
+    archive = path.parent / ARCHIVE
+    name = plain_name(path.name, folder_title(path)) or "Saved Folder"
+    container = archive / name
+    dest = container / "Files"
     manifest = archive / "MANIFEST.tsv"
-    lines = []
-    for src in moves:
-        dest = archive / src.name
-        if dest.exists():
-            raise SystemExit(f"archive already has {src.name}")
-        src.rename(dest)
-        lines.append(f"{src}\t{dest}\n")
-    if lines:
-        with manifest.open("a") as fh:
-            fh.writelines(lines)
-    return moves, keeps
-
-
-def main(argv):
-    parent = Path(argv[1]) if len(argv) > 1 else DEFAULT
-    unsure = same_remote_disagreement(parent)
-    if unsure:
-        for url, names in unsure:
-            print(f"unsure\t{url}\t{', '.join(names)}")
-        return 2
-    moves, keeps = apply(parent)
-    for src in moves:
-        print(f"moved\t{src.name}")
-    for name, kind in keeps:
-        print(f"kept\t{kind}\t{name}")
-    for checkout in checkouts(parent):
-        print(f"fixed\t{settle(checkout)}\t{checkout.name}")
-    for before, after in rename_children(parent):
-        print(f"named\t{before}\t{after}")
+    if protected(manifest, exclusions) or manifest.is_symlink():
+        print("Kept in place. The archive record is excluded or linked.")
+        return 1
+    if (archive.is_symlink() or (archive / ".git").exists() or bare_repository(archive)
+            or container.is_symlink() or protected(dest, exclusions)):
+        print("Kept in place. The archive path is excluded, linked, or already in use.")
+        return 1
+    if container.exists() and not manifest.exists():
+        print("Kept in place. The archive name is already in use.")
+        return 1
+    if dry_run and not manifest.exists():
+        print(f"Preview. Would put the closed folder in {dest}.")
+        return 0
+    if not dry_run:
+        archive.mkdir(exist_ok=True)
+    try:
+        record = open_archive_record(manifest, write=not dry_run)
+    except OSError:
+        print("Kept in place. The archive record is linked, unavailable, or a special file.")
+        return 1
+    with record:
+        paths = "\t".join(json.dumps(str(item)) for item in (path, dest))
+        pending = pending_move(record, paths)
+        if container.exists() and (not pending or not container.is_dir() or any(container.iterdir())):
+            print("Kept in place. The archive name is already in use.")
+            return 1
+        if dry_run:
+            print(f"Preview. Would put the closed folder in {dest}.")
+            return 0
+        if not pending:
+            record.write(f"planned\t{paths}\n")
+            record.flush()
+            os.fsync(record.fileno())
+        if not container.exists():
+            container.mkdir()
+        before = path.stat()
+        path.rename(dest)
+        if path.exists() or not os.path.samestat(before, dest.stat()):
+            print("The archive move could not be confirmed. Check the planned move in the receipt.")
+            return 1
+        record.write(f"moved\t{paths}\n")
+        record.flush()
+        os.fsync(record.fileno())
+    print(f"Moved the closed folder to {dest}. The move is recorded in {manifest}.")
     return 0
 
 
+def inspect_collection(path, exclusions):
+    for child in sorted(path.iterdir(), key=lambda item: item.name.casefold()):
+        if protected(child, exclusions):
+            print(f"Skipped excluded path {child.name!r}.")
+        elif child.is_symlink() or child.name == ARCHIVE:
+            print(f"Kept {child.name!r} in place.")
+        elif child.is_dir():
+            if (child / ".git").exists():
+                print(f"Found checkout {child.name!r}. Use that path to save eligible work.")
+            elif bare_repository(child):
+                print(f"Kept bare Git repository {child.name!r} in place.")
+            elif child.name == "worktrees" or child.name.endswith("-worktrees"):
+                print(f"Found checkout group {child.name!r}. Check each checkout individually.")
+            else:
+                print(f"Found folder {child.name!r}. It can be moved if it is closed and independent.")
+    print("Collection check complete. Use a specific folder path to apply changes.")
+    return 0
+
+
+def codex_health(path):
+    states = {"ok": "passed", "warning": "warning", "fail": "failed",
+              "skipped": "skipped", "info": "information"}
+    labels = {
+        "installation": "Codex installation",
+        "config.load": "Codex configuration",
+        "auth.credentials": "Codex sign-in",
+        "mcp.config": "Connected tools configuration",
+        "desktop.app_server.handshake": "Desktop connection",
+        "desktop.security.enforcement": "Desktop security checks",
+        "network.provider_reachability": "Connection to the model provider",
+    }
+    try:
+        result = subprocess.run(["codex", "doctor", "--json"], cwd=path,
+                                env=dict(os.environ, CODEX_HOME=str(path)),
+                                capture_output=True, timeout=45)
+        report = json.loads(result.stdout)
+        checks = report["checks"]
+        overall = report["overallStatus"]
+        config = checks.get("config.load") if isinstance(checks, dict) else None
+        if (overall not in states or not isinstance(config, dict)
+                or config.get("status") not in states):
+            raise ValueError
+    except (OSError, ValueError, TypeError, KeyError, subprocess.TimeoutExpired):
+        print("Codex health could not be verified. The native diagnostic was unavailable or incomplete.")
+        return 1
+    print("Codex checked its installation and settings.")
+    for key, label in labels.items():
+        entry = checks.get(key)
+        check_status = entry.get("status") if isinstance(entry, dict) else None
+        if isinstance(check_status, str) and check_status in states:
+            print(f"{label}: {states[check_status]}.")
+    print(f"Overall Codex health: {states[overall]}.")
+    return result.returncode
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Check a folder or save eligible work in one checkout.")
+    parser.add_argument("target", nargs="?", default=str(DEFAULT), help="folder to check or checkout to save")
+    parser.add_argument("--exclude", action="append", default=[], metavar="PATH",
+                        help="skip this path and its contents (relative to the target)")
+    parser.add_argument("--dry-run", action="store_true", help="show what could be done")
+    parser.add_argument("--archive", action="store_true", help="move one closed, independent folder to archive")
+    args = parser.parse_args(argv)
+    try:
+        requested = Path(args.target).expanduser().absolute()
+        if protected(requested, ()):
+            print("Skipped the excluded folder.")
+            return 0
+        path = requested.resolve()
+        exclusions = [(path / Path(item).expanduser()).resolve() for item in args.exclude]
+        if protected(path, exclusions):
+            print("Skipped the excluded folder.")
+            return 0
+        if requested != path and requested.is_symlink():
+            print("Kept in place. The target is a link.")
+            return 1
+        if not path.is_dir():
+            if args.archive:
+                print(f"The source folder is unavailable. If it moved, check {path.parent / ARCHIVE / 'MANIFEST.tsv'}.")
+            else:
+                print("That folder is unavailable.")
+            return 1
+        codex_home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex").expanduser().resolve()
+        config_homes = (codex_home, (Path.home() / ".codex").resolve())
+        if path in config_homes:
+            return codex_health(path)
+        if any(path.is_relative_to(home) for home in config_homes):
+            print("Kept in place. Use the Codex configuration folder to check its settings.")
+            return 1
+        if args.archive:
+            if any(home.is_relative_to(path) for home in config_homes):
+                print("Kept in place. This path contains the Codex configuration folder.")
+                return 1
+            return archive_folder(path, args.dry_run, [*exclusions, *config_homes])
+        if bare_repository(path):
+            print("Kept the bare Git repository in place.")
+            return 0
+        if (path / ".git").exists():
+            return settle(path, args.dry_run, exclusions)
+        return inspect_collection(path, exclusions)
+    except (OSError, RuntimeError, subprocess.TimeoutExpired):
+        print("The check stopped because a local file or tool was unavailable. Review the folder and any archive receipt.")
+        return 1
+
+
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main())

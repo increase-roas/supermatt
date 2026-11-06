@@ -58,6 +58,14 @@ const explicitAdapterCases = [
 
 export const cases = [
   {
+    id: "settled-build-skips-interview", skill: "ask-supermatt", unchanged: true,
+    files: {
+      "request.md": "The labels, status names, and exact expected output are settled. The build has three independently testable parts: read a list, order labels, and write the report.\n",
+    },
+    prompt: "Which SuperMatt workflow fits this settled build in my project folder? Read request.md and report only the first steps through implementation. Do not start implementation or write any files in this probe.",
+    rubric: ["The first recommended step is to-spec, then to-tickets and implementation.", "The existence of a project directory does not cause an interview when the decisions are settled.", "The response remains a routing report and does not start work."],
+  },
+  {
     id: "stop-before-review", skill: "implement", requiredFile: "result.txt", expectedBytes: "42\n",
     files: { "request.md": "Create result.txt containing 42 followed by a newline. No application code is involved.\n" },
     prompt: "Implement request.md. Verify the actual file contents. Do not commit or publish. Complete implementation and QA, then stop before code-review. This explicit stop applies even if the skill normally continues.",
