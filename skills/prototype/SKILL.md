@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.
+description: Build a throwaway prototype to answer a design question. Use when checking whether a state model or logic feels right, when two rules, skills, or hooks can send the same situation to different next steps, or when exploring what a UI should look like. Conflicting rules use the logic branch.
 license: MIT
 ---
 
@@ -10,7 +10,7 @@ A prototype is **throwaway code that answers a question**. The question decides 
 
 ## Pick a branch
 
-Identify which question is being answered from the user's prompt or surrounding code. If it remains ambiguous and the user is available, ask through the host's live multiple-choice capability, following its schema, or use chat when no such capability is usable:
+Identify which question is being answered from the user's prompt or surrounding code. Two rules, skills, or hooks that can send the same situation to different next steps are the logic branch: do not ask which branch, follow LOGIC.md, and treat each rule as a button. If it remains ambiguous and the user is available, ask through the host's live multiple-choice capability, following its schema, or use chat when no such capability is usable:
 
 - **"Does this logic / state model feel right?"** → [LOGIC.md](LOGIC.md). Build a single shareable HTML file (free-play buttons plus tabbed guided walkthroughs) that pushes the state machine through cases that are hard to reason about on paper, and that a non-developer can drive.
 - **"What should this look like?"** → [UI.md](UI.md). Generate several radically different UI variations on a single route, switchable via a URL search param and a floating bottom bar.

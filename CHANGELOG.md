@@ -24,7 +24,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - `implement`: consults the shared state-contract guidance before changing data contracts, state transitions, shared mutable state, or retryable effects.
 - `implement-spec`: gives each worker the same conditional state-contract check as `implement`.
 - `code-review`: checks duplicate execution and interruption between durable effects against the intended recovery contract. Requires verified test stores and endpoints before replay, otherwise reports a verification gap.
-- `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps. A dropped plugin, skill, zip, or harness routes to `adopt-harness`, which merges the better parts and proves each one before the commit. `improve-agent-setup` stays the score that does not edit. Project facts the code cannot show route to `project-lore`.
+- `prototype`: two rules, skills, or hooks that can send the same situation to different next steps load the logic branch before another rule or another owner is added.
+- `ask-supermatt`: maps implementation flows to the shared state-contract guidance and recovery review, and describes verified examples before mechanical sweeps. A dropped plugin, skill, zip, or harness routes to `adopt-harness`, which merges the better parts and proves each one before the commit. `improve-agent-setup` stays the score that does not edit. Project facts the code cannot show route to `project-lore`. The same conflicting-rules case routes to `prototype` and LOGIC.md.
 - `refactor`: verifies complete, runnable manual examples against automation in scratch before applying a mechanical sweep, including coupled declarations and callers.
 
 ### Fixed

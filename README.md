@@ -237,7 +237,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 
 | Skill | What it does |
 |---|---|
-| **[prototype](./skills/prototype/SKILL.md)** | Build a throwaway prototype to answer a design question: a single shareable HTML file for state/logic, or several toggleable UI variations. |
+| **[prototype](./skills/prototype/SKILL.md)** | Build a throwaway prototype to answer a design question: a single shareable HTML file for state/logic, including when two rules can send one situation two ways, or several toggleable UI variations. |
 | **[diagnosing-bugs](./skills/diagnosing-bugs/SKILL.md)** | Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test. |
 | **[diagnosing-agent-runs](./skills/diagnosing-agent-runs/SKILL.md)** | Diagnose, repair, and verify a failed AI agent run from its traces, logs, and config: find the first deviation, test the runtime contract behind it, make the smallest repair, and verify the task outcome as PASS, FAIL, or PENDING. |
 | **[adopt-harness](./skills/adopt-harness/SKILL.md)** | Scan a dropped plugin, skill, zip, or someone else's harness and merge the better parts into ours in the same turn. |
