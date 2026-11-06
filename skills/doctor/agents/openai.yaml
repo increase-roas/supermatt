@@ -1,5 +1,5 @@
 interface:
   display_name: "SuperMatt: Doctor"
-  short_description: "Save unfinished work and check Codex setup"
+  short_description: "Save unfinished work and check the host setup"
 policy:
   allow_implicit_invocation: true
