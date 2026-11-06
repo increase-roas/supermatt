@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 """Run the doctor command on disposable folders and a Codex diagnostic fixture."""
+import fcntl
 import json
 import os
+import shlex
+import signal
+import subprocess
+import sys
 import tempfile
+import time
 import unittest
+from contextlib import suppress
 from pathlib import Path
 
-from test_settle import doctor, git
+from test_settle import DOCTOR, doctor, git
+
+CORE_CHECKS = ("installation", "config.load", "auth.credentials", "network.provider_reachability")
 
 
 class Doctor(unittest.TestCase):
@@ -189,8 +198,149 @@ printf '%s\n' '{"overallStatus":"ok","checks":{}}'
         result = doctor(home, env=env)
 
         self.assertEqual(result.returncode, 1)
-        self.assertIn("diagnostic was unavailable or incomplete", result.stdout)
+        self.assertIn("diagnostic returned an incomplete or invalid report", result.stdout)
         self.assertNotIn("Overall Codex health: passed", result.stdout)
+
+    def test_missing_codex_executable_reports_unavailable(self):
+        home = self.tree()
+        env = dict(os.environ, CODEX_HOME=str(home), PATH=str(home))
+
+        result = doctor(home, env=env)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("native diagnostic was unavailable", result.stdout)
+        self.assertNotIn("Overall Codex health", result.stdout)
+
+    def codex_report(self, overall, checks):
+        root = self.tree()
+        home = root / ".codex"
+        home.mkdir()
+        native = root / "codex"
+        report = json.dumps({"overallStatus": overall, "checks": checks})
+        native.write_text(f"#!/bin/sh\nprintf '%s\\n' {shlex.quote(report)}\n")
+        native.chmod(0o700)
+        env = dict(os.environ, CODEX_HOME=str(home), PATH=f"{root}:{os.environ['PATH']}")
+        return doctor(home, env=env)
+
+    def test_config_only_report_is_incomplete(self):
+        result = self.codex_report("ok", {"config.load": {"status": "ok"}})
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("diagnostic returned an incomplete or invalid report", result.stdout)
+        self.assertNotIn("Overall Codex health", result.stdout)
+
+    def test_report_requires_a_recognized_status_for_each_core_check(self):
+        for missing_status in CORE_CHECKS:
+            with self.subTest(missing_status=missing_status):
+                checks = {key: {"status": "ok"} for key in CORE_CHECKS}
+                checks[missing_status] = {"status": "unknown"}
+
+                result = self.codex_report("ok", checks)
+
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("diagnostic returned an incomplete or invalid report", result.stdout)
+                self.assertNotIn("Overall Codex health", result.stdout)
+
+    def test_native_zero_exit_does_not_mask_reported_failure(self):
+        checks = {key: {"status": "ok"} for key in CORE_CHECKS}
+        for status, exit_code, summary in (("fail", 1, "failed"), ("warning", 0, "warning")):
+            with self.subTest(status=status):
+                checks["network.provider_reachability"]["status"] = status
+                result = self.codex_report(status, checks)
+
+                self.assertEqual(result.returncode, exit_code)
+                self.assertIn(f"Overall Codex health: {summary}", result.stdout)
+
+    def codex_pipe_fixture(self):
+        root = self.tree()
+        home = root / ".codex"
+        home.mkdir()
+        native = root / "codex"
+        fixture = root / "fixture.py"
+        native.write_text(f"#!/bin/sh\nexec {shlex.quote(sys.executable)} -B {shlex.quote(str(fixture))}\n")
+        native.chmod(0o700)
+        fixture.write_text("""\
+import fcntl
+import os
+import time
+from pathlib import Path
+
+if os.fork() == 0:
+    with open('descendant.lock', 'w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        Path('descendant.pid').write_text(str(os.getpid()))
+        print('private native output', flush=True)
+        time.sleep(8)
+""")
+        self.addCleanup(self.stop_fixture_descendant, home)
+        env = dict(os.environ, CODEX_HOME=str(home), PATH=f"{root}:{os.environ['PATH']}")
+        return home, env
+
+    def stop_fixture_descendant(self, home):
+        pid_file = home / "descendant.pid"
+        if pid_file.exists():
+            with (home / "descendant.lock").open("r+") as lock:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    with suppress(ProcessLookupError):
+                        os.kill(int(pid_file.read_text()), signal.SIGKILL)
+
+    def assert_descendant_stopped(self, home):
+        self.assertTrue((home / "descendant.pid").is_file(), "fixture descendant never started")
+        with (home / "descendant.lock").open("r+") as lock:
+            # A killed child can still appear as a zombie. Its lock proves whether it can run.
+            deadline = time.monotonic() + 0.5
+            while True:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if time.monotonic() >= deadline:
+                        self.fail("the diagnostic returned while its descendant was still alive")
+                    time.sleep(0.01)
+
+    def test_codex_timeout_stops_a_descendant_holding_the_output_pipe(self):
+        home, env = self.codex_pipe_fixture()
+        # Shorten only the budget. Exercise the command entry point with a real process tree.
+        command = "import doctor; doctor.CODEX_DIAGNOSTIC_TIMEOUT = 1; raise SystemExit(doctor.main())"
+        try:
+            result = subprocess.run(
+                [sys.executable, "-B", "-c", command, str(home)],
+                cwd=Path(__file__).resolve().parent, env=env, text=True, capture_output=True, timeout=4,
+            )
+        except subprocess.TimeoutExpired:
+            self.fail("the Doctor command ran past the diagnostic deadline")
+
+        self.assert_descendant_stopped(home)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Running the native Codex diagnostic", result.stdout)
+        self.assertIn("timed out", result.stdout)
+        self.assertNotIn("Overall Codex health", result.stdout)
+        self.assertNotIn("private native output", result.stdout + result.stderr)
+
+    def test_terminating_doctor_stops_the_native_descendant(self):
+        home, env = self.codex_pipe_fixture()
+        with subprocess.Popen(
+            [sys.executable, "-B", str(DOCTOR), str(home)],
+            env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        ) as process:
+            try:
+                pid_file = home / "descendant.pid"
+                deadline = time.monotonic() + 3
+                while not pid_file.exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                self.assertTrue(pid_file.exists(), "fixture descendant never started")
+                process.terminate()
+                stdout, stderr = process.communicate(timeout=3)
+            finally:
+                if process.poll() is None:
+                    process.kill()
+
+        self.assert_descendant_stopped(home)
+        self.assertEqual(process.returncode, 143)
+        self.assertNotIn("Overall Codex health", stdout)
+        self.assertEqual(stderr, "")
 
     def test_codex_home_uses_native_diagnostic_and_prints_only_health(self):
         root = self.tree()
@@ -205,22 +355,33 @@ printf '%s\n' '{"overallStatus":"ok","checks":{}}'
             "#!/bin/sh\n"
             'test "$*" = "doctor --json" || exit 7\n'
             'test "$CODEX_HOME" = "$PWD" || exit 8\n'
+            'if read -r input; then exit 9; fi\n'
             "cat <<'EOF'\n"
             '{"overallStatus":"fail","checks":{"config.load":{"status":"ok"},'
+            '"installation":{"status":"ok"},"network.provider_reachability":{"status":"ok"},'
             '"auth.credentials":{"status":"fail","detail":"Fixture secret marker"},'
-            '"desktop.security.enforcement":{"status":"warning"}}}\n'
+            '"desktop.security.enforcement":{"status":"warning"},'
+            '"state.rollout_db_parity":{"status":"warning"},'
+            '"terminal.env":{"status":"warning"}}}\n'
             "EOF\n"
+            "echo 'Private stderr marker' >&2\n"
             "exit 1\n")
         native.chmod(0o700)
         env = dict(os.environ, CODEX_HOME=str(home), PATH=f"{bin_path}:{os.environ['PATH']}")
 
-        result = doctor(home, "--dry-run", env=env)
+        result = subprocess.run(
+            [sys.executable, "-B", str(DOCTOR), str(home), "--dry-run"],
+            env=env, input="caller stdin\n", text=True, capture_output=True, timeout=4,
+        )
 
         self.assertEqual(result.returncode, 1)
         self.assertIn("Codex configuration: passed", result.stdout)
         self.assertIn("Codex sign-in: failed", result.stdout)
         self.assertIn("Desktop security checks: warning", result.stdout)
+        self.assertIn("Session history consistency: warning", result.stdout)
+        self.assertIn("Terminal environment: warning", result.stdout)
         self.assertNotIn("Fixture secret marker", result.stdout + result.stderr)
+        self.assertNotIn("Private stderr marker", result.stdout + result.stderr)
         self.assertEqual(marker.read_text(), "# configuration bytes")
 
 

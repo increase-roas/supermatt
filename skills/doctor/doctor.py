@@ -5,11 +5,12 @@ import fcntl
 import json
 import os
 import re
+import signal
 import stat
 import subprocess
 import sys
 import tempfile
-from contextlib import ExitStack
+from contextlib import ExitStack, suppress
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
@@ -19,6 +20,7 @@ DEFAULT = Path.home() / "Documents" / "Codex"
 ARCHIVE = "archive"
 MAX_FILE_BYTES = 2_000_000
 MAX_SNAPSHOT_BYTES = 25_000_000
+CODEX_DIAGNOSTIC_TIMEOUT = 75
 PROTECTED_NAME = re.compile(r"(?:^|[^a-z0-9])javar(?:testing)?(?:$|[^a-z0-9])", re.I)
 SECRET_PATH = re.compile(
     r"(?:^|[._-])(?:env|secrets?|credentials?|id_rsa|id_ed25519)(?:$|[._-])|"
@@ -507,9 +509,54 @@ def inspect_collection(path, exclusions):
     return 0
 
 
+def run_codex_diagnostic(path):
+    stop_requested = False
+    waiting = False
+
+    def terminate(signum, _frame):
+        nonlocal stop_requested
+        if not stop_requested:
+            stop_requested = True
+            if waiting:
+                raise SystemExit(128 + signum)
+
+    previous_handler = signal.signal(signal.SIGTERM, terminate)
+    try:
+        # Defer termination during launch until we have the process group to stop.
+        process = subprocess.Popen(
+            ["codex", "doctor", "--json"], cwd=path, env=dict(os.environ, CODEX_HOME=str(path)),
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+        completed = False
+        try:
+            try:
+                waiting = True
+                if stop_requested:
+                    raise SystemExit(128 + signal.SIGTERM)
+                stdout, _ = process.communicate(timeout=CODEX_DIAGNOSTIC_TIMEOUT)
+                completed = True
+            finally:
+                waiting = False
+        finally:
+            process.stdout.close()
+            if not completed:
+                # The launcher can exit while a descendant still holds the output pipe.
+                with suppress(ProcessLookupError):
+                    os.killpg(process.pid, signal.SIGKILL)
+                with suppress(subprocess.TimeoutExpired):
+                    process.wait(timeout=1)
+    finally:
+        signal.signal(signal.SIGTERM, previous_handler)
+        if stop_requested:
+            raise SystemExit(128 + signal.SIGTERM)
+    return stdout, process.returncode
+
+
 def codex_health(path):
     states = {"ok": "passed", "warning": "warning", "fail": "failed",
               "skipped": "skipped", "info": "information"}
+    required_checks = ("installation", "config.load", "auth.credentials", "network.provider_reachability")
     labels = {
         "installation": "Codex installation",
         "config.load": "Codex configuration",
@@ -518,20 +565,27 @@ def codex_health(path):
         "desktop.app_server.handshake": "Desktop connection",
         "desktop.security.enforcement": "Desktop security checks",
         "network.provider_reachability": "Connection to the model provider",
+        "state.paths": "Codex state paths",
+        "state.rollout_db_parity": "Session history consistency",
+        "terminal.env": "Terminal environment",
     }
+    print(f"Running the native Codex diagnostic (up to {CODEX_DIAGNOSTIC_TIMEOUT} seconds).", flush=True)
     try:
-        result = subprocess.run(["codex", "doctor", "--json"], cwd=path,
-                                env=dict(os.environ, CODEX_HOME=str(path)),
-                                capture_output=True, timeout=45)
-        report = json.loads(result.stdout)
+        stdout, returncode = run_codex_diagnostic(path)
+    except subprocess.TimeoutExpired:
+        print(f"Codex health could not be verified. The native diagnostic timed out after {CODEX_DIAGNOSTIC_TIMEOUT} seconds.")
+        return 1
+    except OSError:
+        print("Codex health could not be verified. The native diagnostic was unavailable.")
+        return 1
+    try:
+        report = json.loads(stdout)
         checks = report["checks"]
         overall = report["overallStatus"]
-        config = checks.get("config.load") if isinstance(checks, dict) else None
-        if (overall not in states or not isinstance(config, dict)
-                or config.get("status") not in states):
+        if overall not in states or not all(checks[key]["status"] in states for key in required_checks):
             raise ValueError
-    except (OSError, ValueError, TypeError, KeyError, subprocess.TimeoutExpired):
-        print("Codex health could not be verified. The native diagnostic was unavailable or incomplete.")
+    except (ValueError, TypeError, KeyError):
+        print("Codex health could not be verified. The native diagnostic returned an incomplete or invalid report.")
         return 1
     print("Codex checked its installation and settings.")
     for key, label in labels.items():
@@ -540,7 +594,9 @@ def codex_health(path):
         if isinstance(check_status, str) and check_status in states:
             print(f"{label}: {states[check_status]}.")
     print(f"Overall Codex health: {states[overall]}.")
-    return result.returncode
+    if overall == "fail" and returncode == 0:
+        return 1
+    return returncode
 
 
 def main(argv=None):
