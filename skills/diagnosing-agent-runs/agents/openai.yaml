@@ -1,0 +1,3 @@
+interface:
+  display_name: "SuperMatt: Diagnosing Agent Runs"
+  short_description: "Diagnose, repair, and verify a failed AI agent run"

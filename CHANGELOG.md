@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `diagnosing-agent-runs`: diagnoses, repairs, and verifies a failed AI agent run from its traces, logs, and config, with runtime fault boundaries for tool schemas, MCP errors, retrieval, instruction loading, permissions, turn limits, and resume. Adapted from Sergey Skripko's agent-debugging plugin (MIT).
 - `improve-agent-setup`: scores a repository's agent setup across seven areas with cited evidence, checks it against a list of known setup anti-patterns, stops when it is healthy, and ranks fixes into a plan for `/implement`.
 
 ### Changed

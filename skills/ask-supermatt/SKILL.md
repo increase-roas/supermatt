@@ -12,7 +12,7 @@ You don't remember every skill, so ask.
 
 Skills are named here as `/name`, which is also the Cursor and Claude linked-skill form. From the Claude Code plugin, type `/supermatt:name`: a bare `/code-review` runs Claude Code's bundled review, not this one. In Codex, type `$name`; in OMP, type `/skill:name`. Preserve arguments in every form.
 
-A **flow** is a path through the skills. Most paths run along one **main flow**, and four **on-ramps** merge onto it. Everything else is standalone, or a vocabulary layer that runs underneath.
+A **flow** is a path through the skills. Most paths run along one **main flow**, and five **on-ramps** merge onto it. Everything else is standalone, or a vocabulary layer that runs underneath.
 
 ## The main flow: idea → ship
 
@@ -58,6 +58,8 @@ A starting situation that generates work, then merges onto the main flow.
   Triage is for raw issues that are **not already agent-ready**: bug reports, incoming feature requests, anything that arrives raw. Specs and tickets that `/to-spec` and `/to-tickets` produced are already agent-ready, so **don't triage them**; `/triage` leaves them out of its queue.
 
 - **Something's broken** → **`/diagnosing-bugs`**. For the hard ones: the bug that resists a first glance, the intermittent flake, the regression that crept in between two known-good states. It refuses to theorise until it has a **tight feedback loop** (one command that already goes red on *this* bug), then fixes with a regression test, checks the reported symptom is gone in the running program with **`/qa`**, and reviews the fix with **`/code-review`**. After the fix, run **`/retro`** in the same session to identify what would have prevented the bug. When the finding is a missing test seam, use **`/improve-architecture`** to plan the structural work.
+
+- **An AI agent run failed** (stuck, looped on a tool call, used the wrong tool or arguments, ignored its instructions, or said done without finishing) → **`/diagnosing-agent-runs`**. It reconstructs the run from its traces, tests the runtime contract behind the first deviation (tool schema, MCP error kind, permissions, instruction loading, turn limits, resume), makes the smallest repair, and verifies the task outcome as PASS, FAIL, or PENDING without replaying uncertain effects. A failure inside ordinary tool or harness code goes to **`/diagnosing-bugs`**.
 
 - **A huge, foggy effort: a greenfield project or a huge feature build, too big for one session** → **`/wayfinder`**, the most cognitively demanding flow here. When the way from here to the destination isn't visible yet, it charts a **shared map** of **decision tickets** on the issue tracker and resolves them one at a time, producing **decisions, not deliverables**, until the fog is pushed back and the way is clear. Where the tracker lacks exclusive acquisition, one recorded coordinator grants session-owned claims before tickets run in parallel. Where **`/grill-with-docs`** sharpens an idea you can hold in one session, wayfinder is for the idea you can't, and it's slower and denser, so save it for exactly that, never a well-scoped feature.
 

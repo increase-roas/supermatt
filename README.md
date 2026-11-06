@@ -22,8 +22,8 @@
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
-- **Claude Code, Codex, Cursor, and OMP.** Each host loads the same canonical 42-skill tree through a package adapter or documented compatibility fallback.
-- **42 skills.** 33 for engineering and 9 for productivity, listed below.
+- **Claude Code, Codex, Cursor, and OMP.** Each host loads the same canonical 43-skill tree through a package adapter or documented compatibility fallback.
+- **43 skills.** 34 for engineering and 9 for productivity, listed below.
 - **Peer review is repository-controlled.** `docs/agents/cross-model.json` can keep `code-review` and `jury` entirely on current-host readers, automatically select a hardened Claude or Codex peer, or explicitly select Claude, Codex, Cursor Agent, or OMP with supported model and effort values.
 - **One flow from idea to closed issue.** Forked from [mattpocock/skills](https://github.com/mattpocock/skills) at `c55ee46`, each skill checks its own work and hands the result to the next.
 
@@ -197,6 +197,7 @@ Some of the checks above are adapted from other skill sets:
 | [Superpowers](https://github.com/obra/superpowers) | `tdd`, `diagnosing-bugs` |
 | Luke Ramsden's [software-design](https://github.com/lukeramsden/software-design-agent-skill) | `codebase-design` |
 | Robert C. Martin's [ub-mode](https://github.com/unclebob/ub-mode/blob/57a8bdd28e45ed41900ace0bafa2ff76dd9ed70f/SKILL.md) | Data contracts and recovery in `codebase-design`, recovery checks in `code-review`, and verified transformation examples in `refactor`. |
+| Sergey Skripko's [agent-debugging](https://github.com/grayskripko/marketing-skills) | `diagnosing-agent-runs`. See [attribution](./THIRD-PARTY-NOTICES.md). |
 | Dex Horthy's [show-me](https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md) | `pr` |
 | GitHub's [awesome-copilot](https://github.com/github/awesome-copilot) refactor skills | `refactor` |
 | Leonardo Flores's [reducing-entropy](https://github.com/softaworks/agent-toolkit/tree/main/skills/reducing-entropy) | `refactor` |
@@ -238,6 +239,7 @@ The full record of changes is in [CHANGELOG.md](./CHANGELOG.md).
 |---|---|
 | **[prototype](./skills/prototype/SKILL.md)** | Build a throwaway prototype to answer a design question: a single shareable HTML file for state/logic, or several toggleable UI variations. |
 | **[diagnosing-bugs](./skills/diagnosing-bugs/SKILL.md)** | Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test. |
+| **[diagnosing-agent-runs](./skills/diagnosing-agent-runs/SKILL.md)** | Diagnose, repair, and verify a failed AI agent run from its traces, logs, and config: find the first deviation, test the runtime contract behind it, make the smallest repair, and verify the task outcome as PASS, FAIL, or PENDING. |
 | **[research](./skills/research/SKILL.md)** | Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, using a background agent when available, with fresh-session or direct-research fallbacks. |
 | **[tdd](./skills/tdd/SKILL.md)** | Test-driven development with a red-green loop. Builds features or fixes bugs one vertical slice at a time. |
 | **[domain-modeling](./skills/domain-modeling/SKILL.md)** | Actively build and sharpen a project's domain model by challenging terms, stress-testing with scenarios, and updating `GLOSSARY.md` and ADRs inline. |
