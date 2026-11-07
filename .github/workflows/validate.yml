@@ -36,6 +36,7 @@ jobs:
       - run: sh tests/release.test.sh
       - run: sh tests/directory-branch.test.sh
       - run: python3 -B -m unittest discover -s skills/doctor
+      - run: python3 -B -m unittest discover -s skills/project-lore
       - run: node --test tests/*.test.mjs
 
   skills:

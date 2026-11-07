@@ -14,7 +14,7 @@ Words stay in the repo's glossary. Read `docs/agents/domain.md` when it exists. 
 
 ## Consult
 
-Before a plan or a bug fix, when `docs/lore/` exists. Read `docs/lore/README.md`. Grep `` `code:` `` for the files this task will touch. A path matches when it is the file or a parent directory of it. Read only the matching active entries. Brief at most five bullets, each with its path. Flag an entry whose path is missing. Skip `resolved` and `obsolete` unless the task is about that entry.
+Before a plan or a bug fix, when `docs/lore/` exists. Read `docs/lore/README.md`. Grep `` `code:` `` for the files this task will touch. A path matches when it is the file or a parent directory of it; `~/` and absolute paths are the same file (`python3 match_paths.py <lore-dir> <file>...` lists matching active titles). Read only the matching active entries. Brief at most five bullets, each with its path. Flag an entry whose path is missing. Skip `resolved` and `obsolete` unless the task is about that entry.
 
 ## Capture
 
