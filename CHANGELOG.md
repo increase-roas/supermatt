@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-11-07
+
 ### Added
 
 - `project-lore`: reads `docs/lore/` before a plan or a bug fix, records a pitfall or a why the code cannot show, and checks a diff against `code:` paths before a commit. A `~/` or absolute `code:` path matches the same file, and `python3 skills/project-lore/match_paths.py <lore-dir> <file>...` prints the active entries that match. Vocabulary stays in `GLOSSARY.md`. Adapted from mukiwu/muki-ai-plugins lore (MIT): the consult, capture, and guard loop. Their separate glossary file is left out because `domain-modeling` already owns the term list. The code pointer, accepted synonyms, boundary example, and obsolete-on-rename rule moved into `GLOSSARY-FORMAT.md`.
@@ -748,6 +750,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Claude Code and Codex marketplaces for the plugin and its 25 engineering and productivity skills.
 
 [unreleased]: https://github.com/svyatov/supermatt/compare/v0.23.0...HEAD
+[0.24.0]: https://github.com/increase-roas/supermatt/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/svyatov/supermatt/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/svyatov/supermatt/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/svyatov/supermatt/compare/v0.20.2...v0.21.0
