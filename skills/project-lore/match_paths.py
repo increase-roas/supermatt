@@ -22,7 +22,13 @@ def _norm(path):
         p = os.path.expanduser(p)
     elif p.startswith("./"):
         p = p[2:]
-    return p.lstrip("./") if not p.startswith("/") else os.path.normpath(p)
+    # expanduser on Windows writes backslashes, and those paths do not start
+    # with "/", so slash-normalize again after absolute normalization.
+    if os.path.isabs(p):
+        p = os.path.normpath(p)
+    else:
+        p = p.lstrip("./")
+    return p.replace("\\", "/")
 
 
 _CODE = re.compile(r"`code:`\s*(.+?)\s*(?:→.*?)?\s*`updated:`")
@@ -38,7 +44,9 @@ def scan(lore_dir, files):
                 continue
             title = None
             for line in open(os.path.join(root, name), encoding="utf-8"):
-                if line.startswith("# "):
+                if line.startswith("## "):
+                    title = line[3:].strip()
+                elif line.startswith("# "):
                     title = line[2:].strip()
                 m = _CODE.search(line)
                 if m and title:
