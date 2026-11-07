@@ -61,6 +61,7 @@ sh tests/mutate.test.sh
 sh tests/release.test.sh
 sh tests/directory-branch.test.sh
 python3 -B -m unittest discover -s skills/doctor
+python3 -B -m unittest discover -s skills/project-lore
 bun test tests/
 ```
 
