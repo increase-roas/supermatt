@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- `adopt-harness`: recognizes ordinary-language wiki and harness gap/omission follow-ups; carries the active scope and authorization through follow-up questions, performs full source accounting only for full-adoption requests, and honors explicit recommendation-only narrowing. Added exact-request, pressure, and scope-boundary trigger cases.
+
 ## [0.24.0] - 2026-11-07
 
 ### Added

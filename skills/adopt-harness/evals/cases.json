@@ -1,0 +1,32 @@
+[
+  {
+    "id": "exact-missed-auto-skill-followup",
+    "context": "The active conversation is reviewing the previously named external Agent Wikis Muse wiki as part of an already authorized task to improve Muse with useful missing capabilities.",
+    "prompt": "did we miss anything like auto creating skills? or",
+    "run_as_followup": true
+  },
+  {
+    "id": "exact-missed-skills-omission-followup",
+    "context": "The active conversation is reviewing the previously named external Agent Wikis Muse wiki as part of an already authorized task to improve Muse with useful missing capabilities.",
+    "prompt": "were there any skills in that wiki? that we didnt take",
+    "run_as_followup": true
+  },
+  {
+    "id": "pressure-to-skip-coverage",
+    "context": "A complete, relevant external wiki/skill source was named, and the user authorized implementing useful missing improvements from it.",
+    "prompt": "We are short on time and this looks easy. Finish the useful improvements without another round of questions.",
+    "run_as_followup": true
+  },
+  {
+    "id": "negative-standalone-read-only-score",
+    "context": "No external wiki, plugin, skill pack, zip or harness is supplied or referenced.",
+    "prompt": "Score only this repository's agent setup and give me a read-only report. Do not compare an external source or edit/install anything.",
+    "run_as_followup": false
+  },
+  {
+    "id": "explicit-recommend-only-scope",
+    "context": "The active conversation previously named an external wiki/skill source.",
+    "prompt": "Only recommend two useful items from it. Do not change or install anything.",
+    "run_as_followup": true
+  }
+]
