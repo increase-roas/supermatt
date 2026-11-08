@@ -28,5 +28,29 @@
     "context": "The active conversation previously named an external wiki/skill source.",
     "prompt": "Only recommend two useful items from it. Do not change or install anything.",
     "run_as_followup": true
+  },
+  {
+    "id": "hermes-wiki-adoption",
+    "context": "An external Agent Wikis source was named. No target profile or path is verified yet.",
+    "prompt": "Do what you did for Muse, but to the Hermes profile I already use, using that wiki. Keep its personality. Finish adding useful omissions.",
+    "run_as_followup": true
+  },
+  {
+    "id": "cursor-wiki-adoption",
+    "context": "An external agent wiki is supplied. Target scope is the current repository in Cursor.",
+    "prompt": "Use that wiki to improve Cursor for this repo. Implement the useful missing parts.",
+    "run_as_followup": false
+  },
+  {
+    "id": "request-reusable-skill-not-live-target-change",
+    "context": "A wiki adoption pass for Muse just finished. Hermes and Cursor are examples of future targets.",
+    "prompt": "can you turn this into a skill? so it would be faster like if i wanted you to do it to a hermes, or cursor with that wiki",
+    "run_as_followup": true
+  },
+  {
+    "id": "repeat-source-delta",
+    "context": "A prior source manifest and target contract exist for an authorized full adoption. The refreshed source index shows two changed files.",
+    "prompt": "Run the same wiki adoption again for that agent. Reuse what we checked last time and finish the changes.",
+    "run_as_followup": true
   }
 ]

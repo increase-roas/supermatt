@@ -1,5 +1,5 @@
 interface:
   display_name: "SuperMatt: Adopt a Harness"
-  short_description: "Find and adopt useful pieces missed from an external wiki or harness"
+  short_description: "Adapt useful wiki or harness improvements to a named agent"
 policy:
   allow_implicit_invocation: true

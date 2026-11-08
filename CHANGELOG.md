@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
-- `adopt-harness`: recognizes ordinary-language wiki and harness gap/omission follow-ups; carries the active scope and authorization through follow-up questions, performs full source accounting only for full-adoption requests, and honors explicit recommendation-only narrowing. Added exact-request, pressure, and scope-boundary trigger cases.
+- `adopt-harness`: recognizes ordinary-language wiki and harness gap/omission follow-ups; carries the active scope and authorization through follow-up questions, performs full source accounting only for full-adoption requests, and honors explicit recommendation-only narrowing. Adds target-first adoption for Hermes, Cursor, Muse, and other agents, native owner/loader and artifact checks, identity and learning-mechanism handling, and reusable source manifests for faster repeat passes. Includes exact-request, cross-agent, pressure, and scope-boundary cases.
 
 ## [0.24.0] - 2026-11-07
 
