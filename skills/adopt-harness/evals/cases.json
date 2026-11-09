@@ -52,5 +52,11 @@
     "context": "A prior source manifest and target contract exist for an authorized full adoption. The refreshed source index shows two changed files.",
     "prompt": "Run the same wiki adoption again for that agent. Reuse what we checked last time and finish the changes.",
     "run_as_followup": true
+  },
+  {
+    "id": "direct-muse-file-inspection",
+    "context": "User authorized Muse wiki adoption, but specifically corrected delegating the audit to Muse. Native System files offers direct read/edit. Prior target report claims installation complete.",
+    "prompt": "bro why are we using muse to do that. i wanted you to make sure muse is correctly updated his files. look at the muse files and make sure those .mds are what that wiki says to put in there",
+    "run_as_followup": true
   }
 ]

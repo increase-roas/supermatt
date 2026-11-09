@@ -20,6 +20,10 @@ Resolve the exact existing profile and its host before touching files. Inspect t
 
 Determine whether the requested scope is one repository or the user's global Cursor setup. Inspect effective project/ancestor rules, native skill/plugin discovery, and canonical sources before edits. Use Cursor's supported native formats and refresh route. Preserve app settings and unrelated repositories; do not enable Claude imports or copy Codex's global instructions to make a skill visible. A local rule file or skill link establishes configuration only; verify selection in a fresh Cursor context before claiming observed behavior. No UI-only or CLI-only check proves both surfaces.
 
+### Inspect target files directly
+
+When the user asks us to check an agent's actual files, use the native file view, connector, or filesystem route ourselves. A request sent to that agent to audit or rewrite itself is execution, not independent inspection. Read the current owner files before changing them and reopen the saved copies afterward. Preserve original content or a supported recovery version before writes. If a save or readback times out, reconcile the existing edit before retrying; report the saved state as unverified until readback succeeds.
+
 ### Other targets
 
 Follow the same contract using native owners. Muse's catalogue/YAML, Library paths, and managed self-improvement loop were facts of that runtime, not defaults for another agent. Never transfer source-author hardware, business facts, personality, accounts, or identity references as facts about Alex.
